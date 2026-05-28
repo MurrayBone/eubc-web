@@ -269,12 +269,62 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
-      nav { padding: 1rem 1.5rem; }
+      /* Nav */
+      nav { padding: 1rem 1.25rem; }
       .nav-links { display: none; }
-      .links-section { gap: 3.5rem; padding-bottom: 6rem; }
-      .main-btns { flex-direction: column; gap: 1px; }
-      .partner-logos { gap: 2.5rem; }
-      .partner-logo { height: 42px; }
+
+      /* Hero — use svh so the browser chrome doesn't clip the content */
+      .hero {
+        height: 100vh;
+        height: 100svh;
+      }
+      .hero-content { padding: 0 1.25rem; }
+      .eubc-logo {
+        width: clamp(100px, 32vw, 150px);
+        margin-bottom: 1.4rem;
+      }
+      .hero-title {
+        font-size: clamp(1.75rem, 7.5vw, 2.6rem);
+        letter-spacing: 0.03em;
+      }
+      .hero-rule { margin: 1.1rem auto; }
+      .hero-sub {
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+      }
+
+      /* Links section */
+      .links-section {
+        min-height: 100vh;
+        min-height: 100svh;
+        gap: 3.5rem;
+        padding: 5rem 1.25rem 6rem;
+      }
+
+      /* Buttons — horizontal label + arrow row on mobile */
+      .main-btns {
+        flex-direction: column;
+        max-width: 100%;
+      }
+      .main-btn {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 1.4rem 1.25rem;
+        font-size: 0.82rem;
+        letter-spacing: 0.2em;
+      }
+      /* Arrow always visible on mobile (no hover state on touch) */
+      .main-btn::after {
+        opacity: 0.45;
+        transform: translateX(0);
+      }
+
+      /* Partner logos — stack vertically, full width centered */
+      .partner-logos {
+        flex-direction: column;
+        gap: 2.2rem;
+      }
+      .partner-logo { height: 38px; }
     }
   </style>
 </head>
