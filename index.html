@@ -8,7 +8,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --navy:  #041E42;
+      --navy:  #99d6ea;
       --gold:  #C8A951;
       --cream: #F5F0E8;
       --white: #FFFFFF;
@@ -32,10 +32,10 @@
       align-items: center;
       justify-content: space-between;
       padding: 1.25rem 3rem;
-      background: linear-gradient(to bottom, rgba(4,30,66,0.85) 0%, transparent 100%);
+      background: linear-gradient(to bottom, rgba(153,214,234,0.85) 0%, transparent 100%);
       transition: background 0.4s;
     }
-    nav.scrolled { background: rgba(4,30,66,0.97); }
+    nav.scrolled { background: rgba(153,214,234,0.97); }
 
     .nav-logo {
       font-size: 0.95rem;
@@ -77,15 +77,14 @@
       object-position: center;
     }
 
-    /* layered gradient: dark top-left and bottom for legibility */
     .hero-overlay {
       position: absolute;
       inset: 0;
       background:
         linear-gradient(to bottom,
-          rgba(4,30,66,0.55) 0%,
-          rgba(4,30,66,0.10) 40%,
-          rgba(4,30,66,0.55) 100%);
+          rgba(153,214,234,0.55) 0%,
+          rgba(153,214,234,0.10) 40%,
+          rgba(153,214,234,0.55) 100%);
     }
 
     .hero-content {
@@ -100,7 +99,7 @@
       font-size: 0.72rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: var(--gold);
+      color: var(--white);
       margin-bottom: 1.1rem;
       opacity: 0.9;
     }
@@ -111,46 +110,45 @@
       line-height: 1.12;
       letter-spacing: 0.04em;
       color: var(--white);
-      text-shadow: 0 2px 24px rgba(4,30,66,0.6);
+      text-shadow: 0 2px 24px rgba(0,0,0,0.35);
       margin-bottom: 0.5rem;
     }
 
     .hero-title span {
       display: block;
-      color: var(--gold);
+      color: var(--white);
       font-style: italic;
     }
 
     .hero-rule {
       width: 60px;
       height: 2px;
-      background: var(--gold);
+      background: rgba(255,255,255,0.7);
       margin: 1.6rem auto;
-      opacity: 0.8;
     }
 
     .hero-sub {
       font-size: 0.88rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.75);
+      color: rgba(255,255,255,0.85);
     }
 
     .hero-cta {
       margin-top: 2.4rem;
       display: inline-block;
       padding: 0.75rem 2.2rem;
-      border: 1.5px solid var(--gold);
-      color: var(--gold);
+      border: 1.5px solid var(--white);
+      color: var(--white);
       text-decoration: none;
       font-size: 0.78rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       transition: background 0.25s, color 0.25s;
     }
-    .hero-cta:hover { background: var(--gold); color: var(--navy); }
+    .hero-cta:hover { background: var(--white); color: var(--navy); }
 
-    /* scroll indicator */
+    /* ── SCROLL HINT + HERO BUTTONS ── */
     .scroll-hint {
       position: absolute;
       bottom: 2.2rem;
@@ -160,31 +158,44 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
-      opacity: 0.6;
+      gap: 1rem;
       animation: fadeInUp 2s ease 1s both;
     }
-    .scroll-hint span {
+
+    .scroll-hint-label {
       font-size: 0.65rem;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.25em;
       text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
     }
-    .scroll-hint::after {
-      content: '';
-      display: block;
-      width: 1px;
-      height: 40px;
-      background: var(--gold);
-      animation: drip 1.6s ease-in-out infinite;
+
+    .hero-btns {
+      display: flex;
+      gap: 0.75rem;
     }
-    @keyframes drip {
-      0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
-      50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
-      100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
+
+    .hero-btn {
+      display: inline-block;
+      padding: 0.55rem 1.3rem;
+      border: 1px solid rgba(255,255,255,0.55);
+      color: var(--white);
+      text-decoration: none;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      backdrop-filter: blur(6px);
+      background: rgba(255,255,255,0.08);
+      transition: background 0.2s, border-color 0.2s;
     }
+    .hero-btn:hover {
+      background: rgba(255,255,255,0.22);
+      border-color: rgba(255,255,255,0.9);
+    }
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateX(-50%) translateY(12px); }
-      to   { opacity: 0.6; transform: translateX(-50%) translateY(0); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
     }
 
     /* ── SECTIONS ── */
@@ -263,7 +274,7 @@
     }
 
     /* disciplines */
-    .disciplines { background: #081e3a; }
+    .disciplines { background: #7abcd8; }
 
     .card-grid {
       display: grid;
@@ -273,14 +284,14 @@
     }
 
     .card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(200,169,81,0.2);
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
       padding: 2rem 1.5rem;
       transition: border-color 0.25s, background 0.25s;
     }
     .card:hover {
-      border-color: rgba(200,169,81,0.6);
-      background: rgba(200,169,81,0.06);
+      border-color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.2);
     }
 
     .card-icon {
@@ -298,7 +309,7 @@
     .card-text {
       font-size: 0.85rem;
       line-height: 1.7;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255,255,255,0.75);
     }
 
     /* join */
@@ -314,7 +325,7 @@
       display: inline-block;
       padding: 0.85rem 2.8rem;
       background: var(--gold);
-      color: var(--navy);
+      color: #041E42;
       text-decoration: none;
       font-size: 0.8rem;
       font-weight: 700;
@@ -326,7 +337,7 @@
 
     /* ── FOOTER ── */
     footer {
-      background: #020f22;
+      background: #5aa8cc;
       border-top: 1px solid rgba(200,169,81,0.2);
       padding: 3rem 2rem;
       text-align: center;
@@ -351,7 +362,7 @@
       font-size: 0.72rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.45);
+      color: rgba(255,255,255,0.55);
       text-decoration: none;
       transition: color 0.2s;
     }
@@ -359,7 +370,7 @@
 
     .footer-copy {
       font-size: 0.7rem;
-      color: rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.4);
       letter-spacing: 0.08em;
     }
 
@@ -370,6 +381,7 @@
       .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .card-grid { grid-template-columns: 1fr; }
       section { padding: 4rem 1.5rem; }
+      .hero-btns { flex-direction: column; align-items: center; }
     }
   </style>
 </head>
@@ -401,7 +413,12 @@
       <a class="hero-cta" href="#about">Discover More</a>
     </div>
     <div class="scroll-hint">
-      <span>Scroll</span>
+      <div class="hero-btns">
+        <a class="hero-btn" href="#join">Row With Us</a>
+        <a class="hero-btn" href="#">Alumni</a>
+        <a class="hero-btn" href="#">News</a>
+      </div>
+      <span class="scroll-hint-label">Scroll</span>
     </div>
   </section>
 
@@ -500,7 +517,6 @@
   </footer>
 
   <script>
-    // nav background on scroll
     const nav = document.getElementById('nav');
     window.addEventListener('scroll', () => {
       nav.classList.toggle('scrolled', window.scrollY > 60);
