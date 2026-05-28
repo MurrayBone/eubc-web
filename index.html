@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edinburgh University Boat Club</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:  #041E42;
+      --gold:  #C8A951;
+      --cream: #F5F0E8;
+      --white: #FFFFFF;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 3rem;
+      background: linear-gradient(to bottom, rgba(4,30,66,0.85) 0%, transparent 100%);
+      transition: background 0.4s;
+    }
+    nav.scrolled { background: rgba(4,30,66,0.97); }
+
+    .nav-logo {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+    .nav-links a {
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    /* layered gradient: dark top-left and bottom for legibility */
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom,
+          rgba(4,30,66,0.55) 0%,
+          rgba(4,30,66,0.10) 40%,
+          rgba(4,30,66,0.55) 100%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 1.5rem;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.72rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 6vw, 5rem);
+      font-weight: 400;
+      line-height: 1.12;
+      letter-spacing: 0.04em;
+      color: var(--white);
+      text-shadow: 0 2px 24px rgba(4,30,66,0.6);
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title span {
+      display: block;
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    .hero-rule {
+      width: 60px;
+      height: 2px;
+      background: var(--gold);
+      margin: 1.6rem auto;
+      opacity: 0.8;
+    }
+
+    .hero-sub {
+      font-size: 0.88rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .hero-cta {
+      margin-top: 2.4rem;
+      display: inline-block;
+      padding: 0.75rem 2.2rem;
+      border: 1.5px solid var(--gold);
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: background 0.25s, color 0.25s;
+    }
+    .hero-cta:hover { background: var(--gold); color: var(--navy); }
+
+    /* scroll indicator */
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0.6;
+      animation: fadeInUp 2s ease 1s both;
+    }
+    .scroll-hint span {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .scroll-hint::after {
+      content: '';
+      display: block;
+      width: 1px;
+      height: 40px;
+      background: var(--gold);
+      animation: drip 1.6s ease-in-out infinite;
+    }
+    @keyframes drip {
+      0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
+      50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+      100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+      to   { opacity: 0.6; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ── SECTIONS ── */
+    section { padding: 6rem 2rem; }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+      font-weight: 400;
+      line-height: 1.25;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-rule {
+      width: 48px;
+      height: 2px;
+      background: var(--gold);
+      margin-bottom: 2rem;
+      opacity: 0.7;
+    }
+
+    .section-body {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.78);
+      max-width: 640px;
+    }
+
+    /* about */
+    .about { background: var(--navy); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .stat-card {
+      border-top: 1.5px solid var(--gold);
+      padding-top: 1.2rem;
+    }
+
+    .stat-number {
+      font-size: 2.8rem;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* disciplines */
+    .disciplines { background: #081e3a; }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(200,169,81,0.2);
+      padding: 2rem 1.5rem;
+      transition: border-color 0.25s, background 0.25s;
+    }
+    .card:hover {
+      border-color: rgba(200,169,81,0.6);
+      background: rgba(200,169,81,0.06);
+    }
+
+    .card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.6rem;
+      color: var(--gold);
+    }
+
+    .card-text {
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* join */
+    .join {
+      background: var(--navy);
+      text-align: center;
+    }
+
+    .join .section-rule { margin: 0 auto 2rem; }
+    .join .section-body { margin: 0 auto 2.5rem; text-align: left; }
+
+    .join-btn {
+      display: inline-block;
+      padding: 0.85rem 2.8rem;
+      background: var(--gold);
+      color: var(--navy);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+    }
+    .join-btn:hover { opacity: 0.85; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #020f22;
+      border-top: 1px solid rgba(200,169,81,0.2);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+    .footer-links a {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+
+    .footer-copy {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .card-grid { grid-template-columns: 1fr; }
+      section { padding: 4rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a class="nav-logo" href="#">EUBC</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#disciplines">Rowing</a></li>
+      <li><a href="#join">Join Us</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <video autoplay muted loop playsinline preload="auto">
+      <source src="DJI_0312.mov" type="video/mp4" />
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Est. 1874</p>
+      <h1 class="hero-title">
+        Edinburgh University<br /><span>Boat Club</span>
+      </h1>
+      <div class="hero-rule"></div>
+      <p class="hero-sub">On the Water &middot; Duddingston Loch &middot; Scotland</p>
+      <a class="hero-cta" href="#about">Discover More</a>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="section-inner">
+      <div class="about-grid">
+        <div>
+          <p class="section-label">Who We Are</p>
+          <h2 class="section-title">A Legacy on<br />Scottish Waters</h2>
+          <div class="section-rule"></div>
+          <p class="section-body">
+            Edinburgh University Boat Club is one of Scotland's oldest and most celebrated rowing clubs.
+            We bring together students of all abilities — from absolute beginners to competitive athletes —
+            united by a passion for the sport and the camaraderie that comes with it.
+          </p>
+          <p class="section-body" style="margin-top:1rem;">
+            Our squads compete at regional, national, and international level,
+            representing the University of Edinburgh with pride.
+          </p>
+        </div>
+        <div class="about-stats">
+          <div class="stat-card">
+            <div class="stat-number">150+</div>
+            <div class="stat-label">Active Members</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">1874</div>
+            <div class="stat-label">Year Founded</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">30+</div>
+            <div class="stat-label">Boats &amp; Sculls</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">12</div>
+            <div class="stat-label">National Titles</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCIPLINES -->
+  <section class="disciplines" id="disciplines">
+    <div class="section-inner">
+      <p class="section-label">What We Do</p>
+      <h2 class="section-title">Life on the Water</h2>
+      <div class="section-rule"></div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">🚣</div>
+          <div class="card-title">Sweep Rowing</div>
+          <p class="card-text">Compete in fours and eights at regattas across the UK, including BUCS and Scottish Rowing Championships.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🛶</div>
+          <div class="card-title">Sculling</div>
+          <p class="card-text">Develop technical precision in singles, doubles and quads under expert coaching on Duddingston Loch.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🏆</div>
+          <div class="card-title">Competition</div>
+          <p class="card-text">From local head races to national regattas, our crews race throughout the year at every level of the sport.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOIN -->
+  <section class="join" id="join">
+    <div class="section-inner">
+      <p class="section-label">Get Involved</p>
+      <h2 class="section-title">Ready to Row?</h2>
+      <div class="section-rule"></div>
+      <p class="section-body">
+        Whether you have never sat in a boat or have rowed for years, EUBC welcomes you.
+        Join us at the start of term and discover one of Edinburgh's most rewarding student experiences.
+        No experience necessary — just turn up and we'll take care of the rest.
+      </p>
+      <br />
+      <a class="join-btn" href="mailto:eubc@eusa.ed.ac.uk">Get in Touch</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Edinburgh University Boat Club</div>
+    <ul class="footer-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#disciplines">Rowing</a></li>
+      <li><a href="#join">Join Us</a></li>
+      <li><a href="mailto:eubc@eusa.ed.ac.uk">Contact</a></li>
+    </ul>
+    <p class="footer-copy">&copy; 2026 Edinburgh University Boat Club &middot; University of Edinburgh Students' Association</p>
+  </footer>
+
+  <script>
+    // nav background on scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+  </script>
+
+</body>
+</html>
