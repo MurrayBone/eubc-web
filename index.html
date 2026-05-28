@@ -342,7 +342,8 @@
 
   <!-- HERO -->
   <section class="hero">
-    <video autoplay muted loop playsinline preload="auto">
+    <video id="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
+      <source src="DJI_0312.mov" type="video/quicktime" />
       <source src="DJI_0312.mov" type="video/mp4" />
     </video>
     <div class="hero-overlay"></div>
@@ -374,6 +375,13 @@
   </section>
 
   <script>
+    // Force video play on iOS (Low Power Mode / strict autoplay policy)
+    const video = document.getElementById('hero-video');
+    const tryPlay = () => video.play().catch(() => {});
+    tryPlay();
+    document.addEventListener('touchstart', tryPlay, { once: true });
+    document.addEventListener('scroll', tryPlay, { once: true, passive: true });
+
     // Nav solid on scroll
     const nav = document.getElementById('nav');
     window.addEventListener('scroll', () => {
