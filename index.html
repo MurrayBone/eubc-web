@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Edinburgh University Boat Club</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -16,7 +19,7 @@
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Georgia', serif;
+      font-family: 'Trajan Pro', 'Trajan', 'Cinzel', Georgia, serif;
       background: var(--black);
       color: var(--white);
       overflow-x: hidden;
@@ -87,21 +90,35 @@
       );
     }
 
+    /* Logo — pinned to true centre of hero */
+    .hero-logo-wrap {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+
+    .eubc-logo {
+      width: clamp(140px, 20vw, 260px);
+      opacity: 0.88;
+      filter: drop-shadow(0 4px 24px rgba(0,0,0,0.55));
+      display: block;
+    }
+
+    /* Text — anchored to lower portion of hero */
     .hero-content {
-      position: relative;
+      position: absolute;
+      bottom: 13%;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 2;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
       padding: 0 1.5rem;
-    }
-
-    .eubc-logo {
-      width: clamp(130px, 18vw, 230px);
-      opacity: 0.88;
-      margin-bottom: 2rem;
-      filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+      width: 100%;
     }
 
     .hero-title {
@@ -278,18 +295,18 @@
         height: 100vh;
         height: 100svh;
       }
-      .hero-content { padding: 0 1.25rem; }
-      .eubc-logo {
-        width: clamp(100px, 32vw, 150px);
-        margin-bottom: 1.4rem;
+      .eubc-logo { width: clamp(110px, 34vw, 170px); }
+      .hero-content {
+        bottom: 10%;
+        padding: 0 1.25rem;
       }
       .hero-title {
-        font-size: clamp(1.75rem, 7.5vw, 2.6rem);
+        font-size: clamp(1.3rem, 5.5vw, 2rem);
         letter-spacing: 0.03em;
       }
-      .hero-rule { margin: 1.1rem auto; }
+      .hero-rule { margin: 1rem auto; }
       .hero-sub {
-        font-size: 0.68rem;
+        font-size: 0.62rem;
         letter-spacing: 0.12em;
       }
 
@@ -347,8 +364,10 @@
       <source src="DJI_0312.mov" type="video/mp4" />
     </video>
     <div class="hero-overlay"></div>
-    <div class="hero-content">
+    <div class="hero-logo-wrap">
       <img src="EUBC_Logo(notext).png" class="eubc-logo" alt="Edinburgh University Boat Club Crest" />
+    </div>
+    <div class="hero-content">
       <h1 class="hero-title">
         Edinburgh University<br /><span>Boat Club</span>
       </h1>
