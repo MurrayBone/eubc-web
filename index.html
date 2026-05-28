@@ -177,43 +177,63 @@
     /* ── LINKS SECTION ── */
     .links-section {
       min-height: 100vh;
-      background: var(--black);
+      background:
+        radial-gradient(ellipse 80% 40% at 50% 100%, rgba(153,214,234,0.13) 0%, transparent 70%),
+        linear-gradient(to bottom, #000 0%, #020a0e 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 6rem 2rem;
-      gap: 5rem;
+      padding: 6rem 2rem 8rem;
+      gap: 6rem;
     }
 
     .main-btns {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 1px;
       width: 100%;
-      max-width: 720px;
+      max-width: 1040px;
+      background: rgba(153,214,234,0.15);
     }
 
     .main-btn {
-      display: block;
-      width: 100%;
-      padding: 1.7rem 2rem;
-      border: 1px solid rgba(153,214,234,0.4);
-      border-bottom: none;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.1rem;
+      padding: 3.2rem 1.5rem;
+      background: #000;
+      border-top: 2px solid rgba(153,214,234,0.5);
       color: var(--white);
       text-decoration: none;
-      font-size: clamp(0.85rem, 2vw, 1.1rem);
-      letter-spacing: 0.28em;
+      font-size: clamp(0.75rem, 1.4vw, 0.95rem);
+      letter-spacing: 0.3em;
       text-transform: uppercase;
       text-align: center;
-      transition: background 0.25s, color 0.25s, border-color 0.25s;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
     }
-    .main-btn:last-child { border-bottom: 1px solid rgba(153,214,234,0.4); }
+
+    .main-btn::after {
+      content: '→';
+      font-size: 1rem;
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 0.3s, transform 0.3s;
+      color: var(--accent);
+    }
+
     .main-btn:hover {
-      background: var(--accent);
-      color: var(--black);
+      background: rgba(153,214,234,0.07);
+      color: var(--accent);
       border-color: var(--accent);
+    }
+    .main-btn:hover::after {
+      opacity: 1;
+      transform: translateX(0);
     }
 
     /* partner logos */
@@ -221,18 +241,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 3.5rem;
+      gap: 5rem;
       flex-wrap: wrap;
     }
 
     .partner-logo {
-      height: 36px;
+      height: 58px;
       width: auto;
       filter: invert(1);
-      opacity: 0.5;
+      opacity: 0.55;
       transition: opacity 0.25s;
     }
-    .partner-logo:hover { opacity: 0.85; }
+    .partner-logo:hover { opacity: 0.9; }
 
     /* ── SCROLL REVEAL ── */
     .reveal {
@@ -248,12 +268,13 @@
     }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 640px) {
+    @media (max-width: 768px) {
       nav { padding: 1rem 1.5rem; }
       .nav-links { display: none; }
-      .links-section { gap: 3.5rem; }
-      .partner-logos { gap: 2rem; }
-      .partner-logo { height: 28px; }
+      .links-section { gap: 3.5rem; padding-bottom: 6rem; }
+      .main-btns { flex-direction: column; gap: 1px; }
+      .partner-logos { gap: 2.5rem; }
+      .partner-logo { height: 42px; }
     }
   </style>
 </head>
@@ -281,7 +302,7 @@
         Edinburgh University<br /><span>Boat Club</span>
       </h1>
       <div class="hero-rule"></div>
-      <p class="hero-sub">Est. 1874 &middot; Scotland</p>
+      <p class="hero-sub">Est. 1867 &middot; Scotland</p>
     </div>
     <div class="scroll-hint">
       <span class="scroll-hint-label">Scroll</span>
