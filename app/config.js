@@ -12,8 +12,8 @@
 // =============================================================================
 
 window.EUBC_CONFIG = {
-  SUPABASE_URL:     'https://YOUR-PROJECT.supabase.co', // Project Settings → Data API → Project URL
-  SUPABASE_ANON_KEY:'YOUR-PUBLIC-KEY',                 // Project Settings → API Keys → Publishable (or legacy anon) key
+  SUPABASE_URL:     'https://kvwvjawzkrdjfbvtunaj.supabase.co', // Project Settings → Data API → Project URL
+  SUPABASE_ANON_KEY:'sb_publishable_1rkqag-1qJU3Spiv-6oFVg_My8Pcpe7', // Project Settings → API Keys → Publishable (or legacy anon) key
   MEMBER_EMAIL:     'members@eubc.local',               // internal — members only type the password
   ADMIN_EMAIL:      'admin@eubc.local'                  // internal — secretary only types the password
 };
