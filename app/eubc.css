@@ -1,7 +1,7 @@
 /* =============================================================================
    EUBC Transport App — shared stylesheet
    Used by members.html and admin.html.
-   Design language matches the existing EUBC landing page (index.html).
+   Softened-dark Inter theme with drag-and-drop builder classes.
    ============================================================================= */
 
 /* ── Reset ───────────────────────────────────────────────────────────────── */
@@ -11,14 +11,24 @@
   padding: 0;
 }
 
-/* ── Design tokens ───────────────────────────────────────────────────────── */
+/* ── Tokens ──────────────────────────────────────────────────────────────── */
 :root {
-  --black:  #000000;
-  --accent: #99d6ea;
-  --white:  #FFFFFF;
-  --panel:  #0a1318;
-  --line:   rgba(153, 214, 234, 0.25);
-  --muted:  rgba(255, 255, 255, 0.6);
+  /* Palette */
+  --bg:          #10171c;
+  --panel:       #18222a;
+  --panel-2:     #1f2b34;
+  --line:        rgba(255, 255, 255, 0.12);
+  --line-soft:   rgba(255, 255, 255, 0.06);
+  --text:        #e8eef2;
+  --muted:       #9fb0bb;
+  --accent:      #99d6ea;
+  --accent-soft: rgba(153, 214, 234, 0.14);
+  --ok:          #9fe0b0;
+  --danger:      #ff8a8a;
+
+  /* Legacy aliases — kept so any inline references still resolve */
+  --black: #10171c;
+  --white: #e8eef2;
 }
 
 /* ── Base ────────────────────────────────────────────────────────────────── */
@@ -27,14 +37,16 @@ html {
 }
 
 body {
-  font-family: 'Trajan Pro', 'Trajan', 'Cinzel', Georgia, serif;
-  background: var(--black);
-  color: var(--white);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
   min-height: 100vh;
   min-height: 100svh;
 }
 
-/* ── Navigation ──────────────────────────────────────────────────────────── */
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -42,17 +54,17 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.25rem 3rem;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  padding: 1.1rem 2.5rem;
+  background: rgba(16, 23, 28, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border-bottom: 1px solid var(--line);
 }
 
 .nav-logo {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--accent);
   text-decoration: none;
@@ -66,10 +78,10 @@ nav {
 }
 
 .nav-right a {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--muted);
   text-decoration: none;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   transition: color 0.2s;
 }
@@ -82,7 +94,7 @@ nav {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 6rem 1.5rem 4rem; /* top clears the fixed nav */
+  padding: 6rem 2rem 4rem; /* top clears the fixed nav */
 }
 
 /* ── Gate / login screen ─────────────────────────────────────────────────── */
@@ -93,16 +105,17 @@ nav {
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(ellipse 80% 40% at 50% 100%, rgba(153, 214, 234, 0.13) 0%, transparent 70%),
-    linear-gradient(to bottom, #000 0%, #020a0e 100%);
+    radial-gradient(ellipse 80% 40% at 50% 100%, rgba(153, 214, 234, 0.10) 0%, transparent 70%),
+    linear-gradient(to bottom, var(--bg) 0%, #0c1319 100%);
   padding: 2rem;
 }
 
 .gate-card {
   width: 100%;
-  max-width: 360px;
+  max-width: 380px;
   background: var(--panel);
   border: 1px solid var(--line);
+  border-radius: 12px;
   padding: 2.5rem;
   text-align: center;
 }
@@ -118,29 +131,28 @@ nav {
 
 .gate h1 {
   font-size: 1rem;
-  font-weight: 400;
-  letter-spacing: 0.22em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--accent);
   margin-bottom: 0.5rem;
 }
 
 .gate p.subtitle {
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 2rem;
 }
 
 .gate .err {
-  color: #ff8a8a;
-  font-size: 0.78rem;
-  letter-spacing: 0.05em;
+  color: var(--danger);
+  font-size: 0.8rem;
   margin-top: 0.75rem;
 }
 
-/* ── Form controls ───────────────────────────────────────────────────────── */
+/* ── Forms ───────────────────────────────────────────────────────────────── */
 .field {
   margin-bottom: 1rem;
   text-align: left;
@@ -149,7 +161,7 @@ nav {
 label {
   display: block;
   font-size: 0.7rem;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 0.4rem;
@@ -159,15 +171,16 @@ input,
 select,
 textarea {
   width: 100%;
-  background: #06131a;
+  background: var(--panel-2);
   border: 1px solid var(--line);
-  color: var(--white);
-  padding: 0.7rem 0.8rem;
-  font-family: 'Trajan Pro', 'Trajan', 'Cinzel', Georgia, serif;
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0.6rem 0.75rem;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   font-size: 0.9rem;
   appearance: none;
   -webkit-appearance: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input:focus,
@@ -175,6 +188,7 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
 select {
@@ -190,64 +204,67 @@ textarea {
 }
 
 /* ── Buttons ─────────────────────────────────────────────────────────────── */
-
-/* Base — mirrors the landing page .main-btn */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.8rem 1.4rem;
-  background: var(--black);
-  border: none;
-  border-top: 2px solid rgba(153, 214, 234, 0.5);
-  color: var(--white);
-  font-family: 'Trajan Pro', 'Trajan', 'Cinzel', Georgia, serif;
-  font-size: 0.78rem;
-  letter-spacing: 0.2em;
+  padding: 0.7rem 1.2rem;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.3s, color 0.3s, border-color 0.3s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
 .btn:hover {
-  background: rgba(153, 214, 234, 0.07);
+  background: var(--accent-soft);
   color: var(--accent);
-  border-top-color: var(--accent);
+  border-color: var(--accent);
 }
 
-/* Primary — accent-filled, dark text */
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Primary — accent-filled */
 .btn-primary {
   background: var(--accent);
-  color: #00131a;
-  border-top-color: var(--accent);
+  color: #0c1f17;
+  border-color: var(--accent);
+  font-weight: 600;
 }
 
 .btn-primary:hover {
   background: #7fc8de;
-  color: #00131a;
-  border-top-color: #7fc8de;
+  color: #0c1f17;
+  border-color: #7fc8de;
 }
 
-/* Ghost — transparent with accent border */
+/* Ghost — subtle outline */
 .btn-ghost {
   background: transparent;
   border: 1px solid var(--line);
-  border-top: 2px solid rgba(153, 214, 234, 0.5);
   color: var(--muted);
 }
 
 .btn-ghost:hover {
-  background: rgba(153, 214, 234, 0.07);
+  background: var(--accent-soft);
   color: var(--accent);
   border-color: var(--accent);
-  border-top-color: var(--accent);
 }
 
 .btn:disabled,
 .btn[disabled] {
-  opacity: 0.4;
+  opacity: 0.38;
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -261,54 +278,79 @@ textarea {
 .panel {
   background: var(--panel);
   border: 1px solid var(--line);
+  border-radius: 10px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
 .panel-title {
   font-size: 0.72rem;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--accent);
+  font-weight: 600;
   margin-bottom: 1.25rem;
 }
 
 /* ── Tabs ────────────────────────────────────────────────────────────────── */
 .tabs {
   display: flex;
-  gap: 1px;
-  background: var(--line);
+  gap: 2px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 4px;
   margin-bottom: 1.5rem;
 }
 
 .tab {
   flex: 1;
-  padding: 0.9rem;
-  background: #000;
+  padding: 0.6rem 1rem;
+  background: transparent;
   color: var(--muted);
   text-align: center;
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.1em;
   font-size: 0.75rem;
-  font-family: 'Trajan Pro', 'Trajan', 'Cinzel', Georgia, serif;
+  font-weight: 500;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   border: none;
-  border-top: 2px solid transparent;
-  transition: color 0.2s, border-top-color 0.2s, background 0.2s;
+  border-radius: 7px;
+  transition: color 0.2s, background 0.2s;
 }
 
 .tab:hover {
-  color: var(--white);
-  background: rgba(153, 214, 234, 0.04);
+  color: var(--text);
+  background: var(--line-soft);
 }
 
 .tab.active {
   color: var(--accent);
-  border-top-color: var(--accent);
-  background: var(--panel);
+  background: var(--panel-2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* ── Transport plan grid ─────────────────────────────────────────────────── */
+/* ── Section heading ─────────────────────────────────────────────────────── */
+.section-heading {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+/* ── Divider rule ────────────────────────────────────────────────────────── */
+hr.rule {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 1.5rem 0;
+}
+
+/* ── Plan table ──────────────────────────────────────────────────────────── */
 .plan-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -322,35 +364,35 @@ textarea {
 
 .plan-table th,
 .plan-table td {
-  border: 1px solid #333;
+  border: 1px solid var(--line);
   padding: 0.5rem 0.6rem;
   vertical-align: top;
 }
 
 /* Row-label cells (far-left) */
 .plan-table .row-label {
-  background: #111;
+  background: var(--panel);
   color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.7rem;
   white-space: nowrap;
   text-align: right;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 /* Driver name in a car cell */
 .plan-table .driver {
   font-weight: 700;
-  color: #000;
+  color: #0c1f17;
 }
 
-/* Coloured location bands — apply inline background-color per location */
+/* Coloured location bands — background set inline per pickup_location.colour */
 .cell-band {
-  /* background is set inline from pickup_location.colour */
+  /* background is set inline */
 }
 
-/* Text on coloured-background cells */
+/* Text on coloured-background cells — dark text for pastel readability */
 .on-band {
   color: #0c1f17;
 }
@@ -364,21 +406,21 @@ table.roster {
 table.roster th,
 table.roster td {
   border-bottom: 1px solid var(--line);
-  padding: 0.5rem;
+  padding: 0.5rem 0.6rem;
   text-align: left;
   font-size: 0.85rem;
 }
 
 table.roster th {
   font-size: 0.7rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
-  font-weight: 400;
+  font-weight: 500;
 }
 
 table.roster tr:hover td {
-  background: rgba(153, 214, 234, 0.04);
+  background: var(--accent-soft);
 }
 
 /* ── Row actions ─────────────────────────────────────────────────────────── */
@@ -389,37 +431,307 @@ table.roster tr:hover td {
   align-items: center;
 }
 
-/* ── Status messages ─────────────────────────────────────────────────────── */
+/* ── Messages ────────────────────────────────────────────────────────────── */
 .msg {
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
 }
 
-.msg.ok  { color: #9fe0b0; }
-.msg.err { color: #ff8a8a; }
+.msg.ok  { color: var(--ok); }
+.msg.err { color: var(--danger); }
 
-/* Utility: hide an element (e.g. via the hidden attribute) */
+/* Utility: honour the hidden attribute */
 [hidden] { display: none !important; }
 
-/* ── Section heading ─────────────────────────────────────────────────────── */
-.section-heading {
-  font-size: 0.78rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 1rem;
-  padding-bottom: 0.6rem;
-  border-bottom: 1px solid var(--line);
+/* ── Builder / Drag-drop ─────────────────────────────────────────────────── */
+
+/* Top-level two-column layout: bank | builder canvas */
+.builder-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
 }
 
-/* ── Divider rule ────────────────────────────────────────────────────────── */
-hr.rule {
+/* Members bank — sticky sidebar */
+.bank {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1rem;
+  position: sticky;
+  top: 5rem;
+  max-height: calc(100vh - 7rem);
+  overflow: auto;
+}
+
+/* Search/filter inside the bank */
+.bank-filter {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  /* inherits all input styling from the Forms block above */
+}
+
+/* A squad / group section within the bank */
+.bank-group {
+  margin-bottom: 1rem;
+}
+
+.bank-group-title {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+/* Wrapping row of member tokens */
+.bank-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* Draggable member pill */
+.token {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: grab;
+  user-select: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.token:hover {
+  border-color: var(--accent);
+}
+
+.token:active {
+  cursor: grabbing;
+}
+
+/* Driver variant — accent left-edge indicator */
+.token--driver {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* Tiny "D" badge rendered inside a .token--driver */
+.token-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #0c1f17;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0 0.3rem;
+  border-radius: 4px;
+  line-height: 1.4;
+}
+
+/* Guest variant — dashed border */
+.token--guest {
+  border-style: dashed;
+}
+
+/* Tap-selected state */
+.token--selected {
+  outline: 2px solid var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Source pill while dragging */
+.token--dragging {
+  opacity: 0.4;
+}
+
+/* Car card ─────────────────────────────────────────────────────────────── */
+.car-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.9rem;
+  margin-bottom: 0.8rem;
+}
+
+/* Flex header: vehicle select + remove button */
+.car-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Driver slot | passengers grid */
+.car-zones {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 0.8rem;
+}
+
+/* Drop zones ───────────────────────────────────────────────────────────── */
+.drop-zone {
+  min-height: 48px;
+  border: 1.5px dashed var(--line);
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-content: flex-start;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.drop-zone-label {
+  width: 100%;
+  font-size: 0.67rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+
+/* Single-occupant driver slot */
+.drop-zone--driver {
+  /* shares all .drop-zone styles; override as needed */
+}
+
+/* Drag-over highlight */
+.drop-zone--over {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Placed token (inside a zone) */
+.placed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: default;
+  user-select: none;
+}
+
+/* Remove (×) button on a placed token */
+.placed-remove {
+  background: none;
   border: none;
-  border-top: 1px solid var(--line);
-  margin: 1.5rem 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+
+.placed-remove:hover {
+  color: var(--danger);
+}
+
+/* Inline note inside a zone (e.g. "not marked as a driver") */
+.zone-note {
+  font-size: 0.7rem;
+  color: var(--muted);
+  width: 100%;
+}
+
+/* Own-way zone ─────────────────────────────────────────────────────────── */
+.ownway-zone {
+  /* extends .drop-zone — apply both classes in HTML */
+}
+
+/* Own-way placed entry chip */
+.ownway-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.82rem;
+}
+
+/* To / Return / Both segmented toggle inside an ownway-chip */
+.mode-toggle {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--panel);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.mode-toggle button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-family: inherit;
+  font-weight: 500;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.mode-toggle button:hover {
+  color: var(--text);
+}
+
+.mode-toggle button.active {
+  background: var(--accent);
+  color: #0c1f17;
+}
+
+/* Add-car / add-location-row buttons */
+.add-car-btn,
+.add-location-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  background: transparent;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.add-car-btn:hover,
+.add-location-row:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
+
+/* Tablet / narrow */
+@media (max-width: 900px) {
+  .builder-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .bank {
+    position: static;
+    max-height: none;
+  }
+}
+
+/* Mobile */
 @media (max-width: 768px) {
   nav {
     padding: 1rem 1.25rem;
@@ -429,7 +741,7 @@ hr.rule {
     padding: 5rem 1rem 3rem;
   }
 
-  /* Stack tabs on mobile */
+  /* Stack tabs */
   .tabs {
     flex-wrap: wrap;
   }
@@ -438,7 +750,7 @@ hr.rule {
     flex: 1 1 45%;
   }
 
-  /* Smaller plan table text on mobile */
+  /* Smaller plan table on mobile */
   .plan-table {
     font-size: 0.75rem;
   }
@@ -448,8 +760,15 @@ hr.rule {
     padding: 0.35rem 0.4rem;
   }
 
-  /* Gate card edge-to-edge on very small screens */
+  /* Gate card edge-to-edge */
   .gate-card {
     padding: 2rem 1.25rem;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 600px) {
+  .car-zones {
+    grid-template-columns: 1fr;
   }
 }

@@ -4,14 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin — Edinburgh University Boat Club</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="app/eubc.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app/config.js"></script>
   <script src="app/supabase.js"></script>
   <style>
-    /* ── Admin-specific overrides ── */
-    body { font-family: 'Cinzel', Georgia, serif; }
+    /* ── Admin-specific layout overrides ── */
 
     /* Gate */
     .gate {
@@ -19,11 +20,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #0a0a0a;
+      background: var(--bg);
     }
     .gate-card {
-      background: #111;
-      border: 1px solid #333;
+      background: var(--panel);
+      border: 1px solid var(--line);
       border-radius: 8px;
       padding: 2.5rem 2rem;
       width: 100%;
@@ -34,7 +35,7 @@
       gap: 1.2rem;
     }
     .gate-card .crest { width: 80px; margin: 0 auto; display: block; }
-    .gate-card h1 { font-size: 1.4rem; color: #fff; letter-spacing: .12em; margin: 0; }
+    .gate-card h1 { font-size: 1.4rem; color: var(--accent); letter-spacing: .12em; margin: 0; }
 
     /* Nav */
     nav {
@@ -42,16 +43,15 @@
       align-items: center;
       justify-content: space-between;
       padding: .75rem 1.5rem;
-      background: #0a0a0a;
-      border-bottom: 1px solid #222;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
       position: sticky; top: 0; z-index: 100;
     }
     .nav-logo {
-      font-family: 'Cinzel', serif;
       font-weight: 700;
       font-size: 1rem;
       letter-spacing: .1em;
-      color: #fff;
+      color: var(--accent);
       text-decoration: none;
     }
     .nav-right { display: flex; gap: .75rem; align-items: center; }
@@ -60,39 +60,47 @@
     .tabs {
       display: flex;
       gap: 0;
-      border-bottom: 1px solid #222;
-      background: #0d0d0d;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
       padding: 0 1.5rem;
     }
     .tab {
       padding: .65rem 1.2rem;
-      font-family: 'Cinzel', serif;
       font-size: .8rem;
       letter-spacing: .1em;
       cursor: pointer;
       border-bottom: 2px solid transparent;
-      color: #888;
+      color: var(--muted);
       background: none;
       border-top: none;
       border-left: none;
       border-right: none;
       transition: color .15s, border-color .15s;
+      font-family: inherit;
     }
-    .tab:hover { color: #ccc; }
-    .tab.active { color: #fff; border-bottom-color: #fff; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-    /* Panels */
-    .panel { display: none; padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
+    /* Panels — tab sections (override eubc.css .panel card style) */
+    .panel {
+      display: none;
+      padding: 1.5rem;
+      max-width: 1300px;
+      margin: 0 auto;
+      background: none;
+      border: none;
+      border-radius: 0;
+    }
     .panel.active { display: block; }
 
     /* Fields & forms */
     .field { display: flex; flex-direction: column; gap: .3rem; margin-bottom: .8rem; }
-    .field label { font-size: .72rem; letter-spacing: .08em; color: #aaa; text-transform: uppercase; }
+    .field label { font-size: .72rem; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
     .field input, .field select, .field textarea {
-      background: #1a1a1a;
-      border: 1px solid #333;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
       border-radius: 4px;
-      color: #e8e8e8;
+      color: var(--text);
       padding: .45rem .65rem;
       font-size: .88rem;
       font-family: inherit;
@@ -100,60 +108,33 @@
       box-sizing: border-box;
     }
     .field input:focus, .field select:focus, .field textarea:focus {
-      outline: none; border-color: #666;
+      outline: none; border-color: var(--accent);
     }
     .field textarea { resize: vertical; min-height: 100px; }
 
-    /* Buttons */
-    .btn {
-      padding: .45rem 1rem;
-      border-radius: 4px;
-      border: 1px solid #444;
-      cursor: pointer;
-      font-family: 'Cinzel', serif;
-      font-size: .78rem;
-      letter-spacing: .07em;
-      transition: background .15s, border-color .15s;
-      background: #1e1e1e;
-      color: #ddd;
-    }
-    .btn:hover { background: #2a2a2a; border-color: #666; }
-    .btn-primary {
-      background: #fff;
-      color: #000;
-      border-color: #fff;
-      font-weight: 600;
-    }
-    .btn-primary:hover { background: #ddd; border-color: #ddd; }
-    .btn-ghost {
-      background: transparent;
-      border-color: transparent;
-      color: #888;
-    }
-    .btn-ghost:hover { color: #ccc; background: #1a1a1a; border-color: #333; }
+    /* Buttons — admin-specific size and danger variants */
     .btn-sm { padding: .3rem .65rem; font-size: .72rem; }
-    .btn-danger { border-color: #7a2020; color: #e87070; }
-    .btn-danger:hover { background: #2a1010; border-color: #a03030; }
-    .btn:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-danger { border-color: rgba(255,138,138,.4); color: var(--danger); }
+    .btn-danger:hover { background: rgba(255,138,138,.1); border-color: var(--danger); }
 
     /* Messages */
     .msg {
       font-size: .82rem;
       padding: .5rem .8rem;
       border-radius: 4px;
-      border: 1px solid #333;
-      color: #aaa;
+      border: 1px solid var(--line);
+      color: var(--muted);
       margin-top: .5rem;
       display: none;
     }
     .msg.show { display: block; }
-    .msg.ok { border-color: #2a5c2a; color: #7ecf7e; background: #0e1f0e; }
-    .msg.err { border-color: #5c2a2a; color: #e07070; background: #1f0e0e; }
+    .msg.ok { border-color: rgba(159,224,176,.3); color: var(--ok); background: rgba(159,224,176,.07); }
+    .msg.err { border-color: rgba(255,138,138,.3); color: var(--danger); background: rgba(255,138,138,.07); }
 
     /* Cards */
     .card {
-      background: #141414;
-      border: 1px solid #2a2a2a;
+      background: var(--panel);
+      border: 1px solid var(--line);
       border-radius: 6px;
       padding: 1rem 1.2rem;
       margin-bottom: 1rem;
@@ -171,7 +152,7 @@
       font-size: .85rem;
       font-weight: 600;
       letter-spacing: .06em;
-      color: #ddd;
+      color: var(--text);
     }
     .colour-swatch {
       display: inline-block;
@@ -181,88 +162,27 @@
       flex-shrink: 0;
     }
 
-    /* Car rows */
-    .car-row {
-      background: #1a1a1a;
-      border: 1px solid #222;
-      border-radius: 4px;
-      padding: .75rem;
-      margin-bottom: .6rem;
-    }
-    .car-row-head {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .5rem;
-      align-items: flex-end;
-      margin-bottom: .6rem;
-    }
-    .car-row-head .field { margin-bottom: 0; flex: 1; min-width: 140px; }
-    .passengers-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .3rem;
-      margin-top: .4rem;
-      min-height: 24px;
-    }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: .3rem;
-      background: #252525;
-      border: 1px solid #333;
-      border-radius: 3px;
-      padding: .2rem .45rem;
-      font-size: .76rem;
-      color: #ccc;
-    }
-    .chip .chip-remove {
-      cursor: pointer;
-      color: #888;
-      line-height: 1;
-      font-size: .9rem;
-    }
-    .chip .chip-remove:hover { color: #e07070; }
-    .add-passenger-row {
-      display: flex;
-      gap: .4rem;
-      margin-top: .5rem;
-      align-items: flex-end;
-    }
-    .add-passenger-row .field { margin-bottom: 0; flex: 1; }
-
-    /* Own Way */
-    .own-way-list { display: flex; flex-direction: column; gap: .4rem; margin-bottom: .6rem; }
-    .own-way-item {
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-      font-size: .83rem;
-      color: #ccc;
-    }
-    .own-way-add { display: flex; gap: .4rem; align-items: flex-end; }
-    .own-way-add .field { margin-bottom: 0; flex: 1; }
-
     /* Need tally */
     .need-tally {
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
       align-items: center;
-      background: #141414;
-      border: 1px solid #222;
+      background: var(--panel);
+      border: 1px solid var(--line);
       border-radius: 4px;
       padding: .7rem 1rem;
     }
     .need-cell { display: flex; flex-direction: column; align-items: center; gap: .15rem; }
-    .need-cell label { font-size: .68rem; color: #888; letter-spacing: .08em; text-transform: uppercase; }
-    .need-cell span { font-size: 1.1rem; font-weight: 600; color: #ddd; }
+    .need-cell label { font-size: .68rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+    .need-cell span { font-size: 1.1rem; font-weight: 600; color: var(--text); }
     .need-cell input[type="number"] {
       width: 60px;
       text-align: center;
-      background: #1a1a1a;
-      border: 1px solid #333;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
       border-radius: 4px;
-      color: #ddd;
+      color: var(--text);
       padding: .25rem;
       font-size: .9rem;
       font-family: inherit;
@@ -277,15 +197,15 @@
       width: 100%;
     }
     .plan-table th, .plan-table td {
-      border: 1px solid #333;
+      border: 1px solid var(--line);
       padding: .35rem .55rem;
       text-align: left;
       white-space: nowrap;
-      color: #ddd;
-      background: #111;
+      color: var(--text);
+      background: var(--bg);
     }
-    .plan-table th { background: #1a1a1a; font-weight: 600; letter-spacing: .05em; }
-    .row-label { font-weight: 600; color: #aaa; background: #151515 !important; }
+    .plan-table th { background: var(--panel); font-weight: 600; letter-spacing: .05em; }
+    .row-label { font-weight: 600; color: var(--muted); background: var(--panel) !important; }
     .on-band { /* coloured location header — inline style sets bg */ }
 
     /* Row actions */
@@ -296,7 +216,7 @@
       align-items: center;
       margin-top: 1.2rem;
       padding-top: 1rem;
-      border-top: 1px solid #222;
+      border-top: 1px solid var(--line);
     }
 
     /* Section headings */
@@ -304,7 +224,7 @@
       font-size: .78rem;
       letter-spacing: .12em;
       text-transform: uppercase;
-      color: #777;
+      color: var(--muted);
       margin: 1.2rem 0 .6rem;
       display: flex;
       align-items: center;
@@ -314,7 +234,7 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: #222;
+      background: var(--line);
     }
 
     /* Roster table */
@@ -324,19 +244,19 @@
       font-size: .8rem;
     }
     table.roster th, table.roster td {
-      border-bottom: 1px solid #1e1e1e;
+      border-bottom: 1px solid var(--line);
       padding: .5rem .6rem;
       text-align: left;
-      color: #ccc;
+      color: var(--text);
     }
     table.roster th {
-      background: #141414;
+      background: var(--panel);
       font-size: .7rem;
       letter-spacing: .08em;
       text-transform: uppercase;
-      color: #888;
+      color: var(--muted);
     }
-    table.roster tr:hover td { background: #161616; }
+    table.roster tr:hover td { background: var(--accent-soft); }
     table.roster .actions { display: flex; gap: .3rem; }
 
     /* Settings */
@@ -345,7 +265,7 @@
     }
     .settings-note {
       font-size: .78rem;
-      color: #666;
+      color: var(--muted);
       margin-top: .3rem;
       line-height: 1.5;
     }
@@ -371,6 +291,72 @@
 
     /* App wrapper hidden by default */
     #app { display: none; }
+
+    /* ── Builder-specific admin tweaks ── */
+
+    /* Bank header */
+    .bank-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .5rem;
+      gap: .5rem;
+    }
+    .bank-title {
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .bank-guest-btn {
+      font-size: .7rem;
+      padding: .2rem .5rem;
+      white-space: nowrap;
+    }
+
+    /* Bank as drop target for un-assigning */
+    .bank.drop-zone--over {
+      outline: 2px dashed var(--accent);
+      outline-offset: -4px;
+    }
+
+    /* Location card (wraps cars) */
+    .location-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .location-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .75rem;
+    }
+
+    /* Inline vehicle select in car head */
+    .car-card-head select {
+      flex: 1;
+      max-width: 200px;
+    }
+
+    /* "Not a driver" zone note styling */
+    .zone-note--warn {
+      color: #f0c040;
+    }
+
+    /* Right column (locations + everything below the bank) */
+    .builder-right {
+      min-width: 0;
+    }
+
+    /* Own way section header in builder */
+    .ownway-section { margin-top: 1rem; }
+
+    /* Placed token draggable back to bank */
+    .placed[draggable="true"] { cursor: grab; }
   </style>
 </head>
 <body>
@@ -421,62 +407,68 @@
       </div>
     </div>
 
-    <!-- Locations -->
-    <div class="section-head">Departure Locations</div>
-    <div id="locations-list"></div>
-    <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:1rem;">
-      <select id="location-select" class="field" style="margin:0;width:auto;min-width:180px;background:#1a1a1a;border:1px solid #333;border-radius:4px;color:#e8e8e8;padding:.45rem .65rem;font-family:inherit;font-size:.88rem;">
-        <option value="">— Add location —</option>
-      </select>
-      <button class="btn btn-sm" id="add-location-btn">+ Add location</button>
-    </div>
+    <!-- 2-col drag-and-drop builder -->
+    <div class="builder-layout">
 
-    <!-- Own Way -->
-    <div class="section-head">Own Way</div>
-    <div class="own-way-list" id="own-way-list"></div>
-    <div class="own-way-add">
-      <div class="field">
-        <label>Member</label>
-        <select id="ow-member-select">
-          <option value="">— Select member —</option>
-        </select>
+      <!-- LEFT: Members bank -->
+      <div class="bank" id="members-bank">
+        <div class="bank-header">
+          <span class="bank-title">Members</span>
+          <button class="btn btn-sm btn-ghost bank-guest-btn" id="bank-guest-btn">+ Guest</button>
+        </div>
+        <input class="bank-filter" id="bank-filter" type="text" placeholder="Filter…" autocomplete="off" />
+        <div id="bank-groups"></div>
       </div>
-      <div class="field">
-        <label>Mode</label>
-        <select id="ow-mode-select">
-          <option value="to">To</option>
-          <option value="return">Return</option>
-          <option value="both" selected>Both</option>
-        </select>
-      </div>
-      <button class="btn btn-sm" id="add-ow-btn" style="margin-bottom:.8rem;">+ Add</button>
-    </div>
 
-    <!-- Need Tally -->
-    <div class="section-head">Need</div>
-    <div class="need-tally">
-      <div class="need-cell"><label>SW</label><span id="need-sw">0</span></div>
-      <div class="need-cell"><label>SM</label><span id="need-sm">0</span></div>
-      <div class="need-cell"><label>C</label><span id="need-c">0</span></div>
-      <div class="need-cell">
-        <label>B</label>
-        <input type="number" id="need-b" value="0" min="0" />
-      </div>
-      <div class="need-cell"><label>Total</label><span id="need-total">0</span></div>
-    </div>
+      <!-- RIGHT: Locations / own way / tally / preview -->
+      <div class="builder-right">
 
-    <!-- Actions -->
-    <div class="row-actions">
-      <button class="btn btn-primary" id="save-draft-btn" disabled>Save draft</button>
-      <button class="btn btn-primary" id="publish-btn" disabled>Publish</button>
-      <button class="btn" id="export-single-btn" disabled>Export CSV (this session)</button>
-      <button class="btn" id="export-term-btn">Export CSV (term to date)</button>
-    </div>
-    <div class="msg" id="plan-msg"></div>
+        <!-- Departure Locations -->
+        <div class="section-head">Departure Locations</div>
+        <div id="locations-list"></div>
+        <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:1rem;">
+          <select id="location-select" style="margin:0;width:auto;min-width:180px;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;color:var(--text);padding:.45rem .65rem;font-family:inherit;font-size:.88rem;">
+            <option value="">— Add location —</option>
+          </select>
+          <button class="btn btn-sm" id="add-location-btn">+ Add location</button>
+        </div>
 
-    <!-- Preview -->
-    <div class="section-head">Preview</div>
-    <div class="plan-wrap" id="plan-preview"></div>
+        <!-- Own Way -->
+        <div class="section-head">Own Way</div>
+        <div class="ownway-section">
+          <div class="own-way-list drop-zone ownway-zone" id="own-way-list">
+            <span class="drop-zone-label">Drop members here — or tap a token then click this zone</span>
+          </div>
+        </div>
+
+        <!-- Need Tally -->
+        <div class="section-head">Need</div>
+        <div class="need-tally">
+          <div class="need-cell"><label>SW</label><span id="need-sw">0</span></div>
+          <div class="need-cell"><label>SM</label><span id="need-sm">0</span></div>
+          <div class="need-cell"><label>C</label><span id="need-c">0</span></div>
+          <div class="need-cell">
+            <label>B</label>
+            <input type="number" id="need-b" value="0" min="0" />
+          </div>
+          <div class="need-cell"><label>Total</label><span id="need-total">0</span></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="row-actions">
+          <button class="btn btn-primary" id="save-draft-btn" disabled>Save draft</button>
+          <button class="btn btn-primary" id="publish-btn" disabled>Publish</button>
+          <button class="btn" id="export-single-btn" disabled>Export CSV (this session)</button>
+          <button class="btn" id="export-term-btn">Export CSV (term to date)</button>
+        </div>
+        <div class="msg" id="plan-msg"></div>
+
+        <!-- Preview -->
+        <div class="section-head">Preview</div>
+        <div class="plan-wrap" id="plan-preview"></div>
+
+      </div><!-- /.builder-right -->
+    </div><!-- /.builder-layout -->
 
   </section>
 
@@ -526,10 +518,10 @@
         </div>
       </div>
       <div style="display:flex;gap:1.5rem;align-items:center;margin-bottom:.8rem;">
-        <label style="font-size:.82rem;color:#ccc;display:flex;align-items:center;gap:.4rem;cursor:pointer;">
+        <label style="font-size:.82rem;color:var(--text);display:flex;align-items:center;gap:.4rem;cursor:pointer;">
           <input type="checkbox" id="m-can-drive" /> Can drive
         </label>
-        <label style="font-size:.82rem;color:#ccc;display:flex;align-items:center;gap:.4rem;cursor:pointer;">
+        <label style="font-size:.82rem;color:var(--text);display:flex;align-items:center;gap:.4rem;cursor:pointer;">
           <input type="checkbox" id="m-active" checked /> Active
         </label>
       </div>
@@ -547,7 +539,7 @@
       <div style="display:flex;gap:.5rem;align-items:center;">
         <button class="btn" id="bulk-parse-btn">Parse &amp; preview</button>
         <button class="btn btn-primary" id="bulk-import-btn" disabled>Import</button>
-        <span id="bulk-preview-count" style="font-size:.8rem;color:#888;"></span>
+        <span id="bulk-preview-count" style="font-size:.8rem;color:var(--muted);"></span>
       </div>
       <div id="bulk-preview-table" style="margin-top:.6rem;overflow-x:auto;"></div>
       <div class="msg" id="bulk-msg"></div>
@@ -612,7 +604,6 @@ let _uid = 0;
 function uid() { return '_' + (++_uid); }
 
 function showMsg(el, text, type) {
-  // type: 'ok' | 'err' | ''
   el.textContent = text;
   el.className = 'msg show' + (type ? ' ' + type : '');
   if (type === 'ok') {
@@ -624,13 +615,11 @@ function showMsg(el, text, type) {
 function fmt2(n) { return Number(n).toFixed(2); }
 
 function parseDate(d) {
-  // 'YYYY-MM-DD' → Date
   const [y,m,day] = d.split('-').map(Number);
   return new Date(y, m-1, day);
 }
 
 function fmtDateCol(d) {
-  // 'YYYY-MM-DD' → 'DD-Mon'
   const dt = parseDate(d);
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   return String(dt.getDate()).padStart(2,'0') + '-' + months[dt.getMonth()];
@@ -644,7 +633,7 @@ function csvField(v) {
   return v;
 }
 
-// Collect all names assigned in plan (driver + passengers) → Set of short_names / guest names
+// Collect all names assigned in plan (driver + passengers + ownWay) → Set
 function assignedNames() {
   const s = new Set();
   for (const loc of state.locations) {
@@ -657,26 +646,90 @@ function assignedNames() {
   return s;
 }
 
-// Available members for a new passenger (not already assigned anywhere)
-function availablePassengers(excludeInCar) {
-  const taken = assignedNames();
-  // Also exclude names in excludeInCar's own car (already chips there)
-  // but assignedNames already picks those up via state traversal
-  return state.members.filter(m => !taken.has(m.short_name));
+// ── Drag-and-drop state ─────────────────────────────────
+// dragData: { kind:'member'|'guest', name, isDriver, fromZone, fromLocIdx, fromCarIdx }
+// fromZone: 'driver'|'passenger'|'ownway'|'bank'
+let dragData = null;
+
+// Tap-to-assign selection
+let selectedToken = null;  // same shape as dragData
+
+// ── Remove from current placement ──────────────────────
+// Searches state and removes the person named `name` from wherever they are placed.
+function removeFromState(name) {
+  for (const loc of state.locations) {
+    for (const car of loc.cars) {
+      if (car.driver === name) {
+        car.driver = '';
+        car.driver_guest = false;
+        car.guestName = '';
+      }
+      car.passengers = car.passengers.filter(p => p.name !== name);
+    }
+  }
+  state.ownWay = state.ownWay.filter(o => o.name !== name);
 }
 
-// Available drivers (can_drive, not already a passenger elsewhere)
-function availableDrivers(currentDriver) {
-  const taken = assignedNames();
-  return state.members.filter(m =>
-    m.can_drive && (!taken.has(m.short_name) || m.short_name === currentDriver)
-  );
+// ── Assign a person to a target zone ───────────────────
+// zone: 'driver'|'passenger'|'ownway'|'bank'
+// locIdx / carIdx: relevant indices (unused for 'ownway'/'bank')
+function assignTo(zone, data, locIdx, carIdx) {
+  // First remove from any existing placement (handles move between zones)
+  removeFromState(data.name);
+
+  if (zone === 'bank') {
+    // Unassign — already done above, just re-render
+  } else if (zone === 'driver') {
+    const car = state.locations[locIdx].cars[carIdx];
+    car.driver = data.name;
+    car.driver_guest = (data.kind === 'guest');
+    car.guestName = (data.kind === 'guest') ? data.name : '';
+  } else if (zone === 'passenger') {
+    const car = state.locations[locIdx].cars[carIdx];
+    car.passengers.push({ name: data.name, guest: (data.kind === 'guest') });
+  } else if (zone === 'ownway') {
+    // Avoid duplicate
+    if (!state.ownWay.find(o => o.name === data.name)) {
+      state.ownWay.push({ name: data.name, mode: 'both' });
+    }
+  }
 }
 
-// Members not already in ownWay
-function availableOwnWay() {
-  const owNames = new Set(state.ownWay.map(o => o.name));
-  return state.members.filter(m => !owNames.has(m.short_name));
+// ── Attach DnD + tap handlers to a drop-zone element ───
+function attachDropZone(el, zone, locIdx, carIdx) {
+  el.addEventListener('dragover', e => {
+    if (!dragData) return;
+    e.preventDefault();
+    el.classList.add('drop-zone--over');
+  });
+  el.addEventListener('dragleave', () => {
+    el.classList.remove('drop-zone--over');
+  });
+  el.addEventListener('drop', e => {
+    e.preventDefault();
+    el.classList.remove('drop-zone--over');
+    if (!dragData) return;
+    const data = dragData;
+    dragData = null;
+    // Validate: driver zone only accepts can_drive members (non-blocking for guests)
+    assignTo(zone, data, locIdx, carIdx);
+    selectedToken = null;
+    renderBuilder();
+    computeNeed();
+    renderPreview();
+  });
+  // Tap-to-assign: click on zone while a token is selected
+  el.addEventListener('click', e => {
+    if (!selectedToken) return;
+    // Don't fire if the click was on a placed-remove button
+    if (e.target.classList.contains('placed-remove')) return;
+    const data = selectedToken;
+    selectedToken = null;
+    assignTo(zone, data, locIdx, carIdx);
+    renderBuilder();
+    computeNeed();
+    renderPreview();
+  });
 }
 
 // ── Gate ───────────────────────────────────────────────
@@ -697,9 +750,14 @@ function showGate() {
   document.getElementById('app').style.display = 'none';
 }
 
+let _bankHandlersWired = false;
 function showApp() {
   document.getElementById('gate').style.display = 'none';
   document.getElementById('app').style.display = 'block';
+  if (!_bankHandlersWired) {
+    initBankHandlers();
+    _bankHandlersWired = true;
+  }
   initApp();
 }
 
@@ -756,6 +814,7 @@ async function initApp() {
     state.settings = settings || {};
     renderLocationSelect();
     populateMemberPickupSelect();
+    renderBuilder(); // populate the members bank + preview now that data is loaded
   } catch (e) {
     console.error('initApp error', e);
   }
@@ -773,11 +832,9 @@ document.getElementById('plan-date').addEventListener('change', async function()
       const msgEl = document.getElementById('plan-msg');
       showMsg(msgEl, 'Loaded existing plan for ' + this.value + '.', '');
     } else {
-      // Clear builder for new date
       resetBuilder();
     }
   } catch (e) {
-    // No plan found — that's fine
     resetBuilder();
   }
 });
@@ -800,6 +857,8 @@ function resetBuilder() {
   document.getElementById('need-b').value = 0;
   document.getElementById('plan-time').value = '';
   state.departureTime = '';
+  selectedToken = null;
+  dragData = null;
   renderBuilder();
 }
 
@@ -810,7 +869,6 @@ function loadPlanData(plan) {
   }
   const data = plan.data || {};
 
-  // Build state.locations from data.locations
   state.locations = (data.locations || []).map(loc => {
     const locInfo = state.pickupLocations.find(l => l.name === loc.location) || {};
     return {
@@ -830,22 +888,202 @@ function loadPlanData(plan) {
   state.needB = (data.need && data.need.B) ? data.need.B : 0;
   document.getElementById('need-b').value = state.needB;
 
+  selectedToken = null;
+  dragData = null;
   renderBuilder();
 }
 
-// ── Builder render ──────────────────────────────────────
+// ── Builder render orchestrator ─────────────────────────
 function renderBuilder() {
+  renderBank();
   renderLocationsList();
   renderOwnWayList();
-  refreshAllPassengerSelects();
   computeNeed();
   renderPreview();
 }
 
+// ── Members Bank ────────────────────────────────────────
+// Re-renders only the token groups inside the bank; DnD/filter/guest
+// handlers are wired once by initBankHandlers() at app start.
+function renderBank() {
+  const container = document.getElementById('bank-groups');
+  // Preserve the guest group (transient guest tokens) across re-renders
+  const guestGroup = document.getElementById('bank-guest-group');
+  container.innerHTML = '';
+
+  const filter = (document.getElementById('bank-filter').value || '').toLowerCase();
+  const taken = assignedNames();
+
+  // Squad order
+  const squads = [
+    { key: 'SW',  label: 'Senior Women' },
+    { key: 'SM',  label: 'Senior Men' },
+    { key: 'Cox', label: 'Coxes' },
+    { key: null,  label: 'Other' },
+  ];
+
+  squads.forEach(({ key, label }) => {
+    const members = state.members.filter(m => {
+      const squadMatch = key === null
+        ? (m.squad === null || m.squad === undefined || m.squad === '')
+        : m.squad === key;
+      const notTaken = !taken.has(m.short_name);
+      const nameMatch = !filter || m.short_name.toLowerCase().includes(filter) || m.full_name.toLowerCase().includes(filter);
+      return squadMatch && notTaken && nameMatch;
+    });
+
+    if (members.length === 0) return;
+
+    const group = document.createElement('div');
+    group.className = 'bank-group';
+
+    const title = document.createElement('div');
+    title.className = 'bank-group-title';
+    title.textContent = label + ' (' + members.length + ')';
+    group.appendChild(title);
+
+    const tokensDiv = document.createElement('div');
+    tokensDiv.className = 'bank-tokens';
+
+    members.forEach(m => {
+      tokensDiv.appendChild(makeBankToken({
+        kind: 'member',
+        name: m.short_name,
+        isDriver: !!m.can_drive,
+      }));
+    });
+
+    group.appendChild(tokensDiv);
+    container.appendChild(group);
+  });
+
+  // Re-append any surviving guest group (clears it if the guest was placed/removed)
+  if (guestGroup && guestGroup.querySelector('.token')) {
+    // Only re-append if the guest isn't already assigned
+    const guestToken = guestGroup.querySelector('.token');
+    const guestName = guestToken ? guestToken.textContent.trim() : null;
+    if (guestName && !taken.has(guestName)) {
+      container.appendChild(guestGroup);
+    }
+  }
+}
+
+// ── Wire bank handlers once at startup ─────────────────
+function initBankHandlers() {
+  // Filter input
+  document.getElementById('bank-filter').addEventListener('input', renderBank);
+
+  // Guest button — creates a transient draggable guest token
+  document.getElementById('bank-guest-btn').addEventListener('click', () => {
+    const name = prompt('Guest name:');
+    if (!name || !name.trim()) return;
+    const guestName = name.trim();
+    const existing = document.getElementById('bank-guest-group');
+    if (existing) existing.remove();
+
+    const group = document.createElement('div');
+    group.className = 'bank-group';
+    group.id = 'bank-guest-group';
+
+    const title = document.createElement('div');
+    title.className = 'bank-group-title';
+    title.textContent = 'Guest';
+    group.appendChild(title);
+
+    const tokensDiv = document.createElement('div');
+    tokensDiv.className = 'bank-tokens';
+    tokensDiv.appendChild(makeBankToken({
+      kind: 'guest',
+      name: guestName,
+      isDriver: false,
+    }));
+    group.appendChild(tokensDiv);
+    document.getElementById('bank-groups').appendChild(group);
+  });
+
+  // Bank as a drop target for un-assigning placed tokens
+  const bankEl = document.getElementById('members-bank');
+  bankEl.addEventListener('dragover', e => {
+    if (!dragData) return;
+    e.preventDefault();
+    bankEl.classList.add('drop-zone--over');
+  });
+  bankEl.addEventListener('dragleave', e => {
+    if (!bankEl.contains(e.relatedTarget)) {
+      bankEl.classList.remove('drop-zone--over');
+    }
+  });
+  bankEl.addEventListener('drop', e => {
+    e.preventDefault();
+    bankEl.classList.remove('drop-zone--over');
+    if (!dragData) return;
+    const data = dragData;
+    dragData = null;
+    assignTo('bank', data, null, null);
+    selectedToken = null;
+    renderBuilder();
+    computeNeed();
+    renderPreview();
+  });
+
+  // Own-way zone — wired once here to avoid accumulation across re-renders
+  attachDropZone(document.getElementById('own-way-list'), 'ownway', null, null);
+}
+
+function makeBankToken(data) {
+  // data: { kind, name, isDriver }
+  const token = document.createElement('span');
+  token.className = 'token' +
+    (data.isDriver ? ' token--driver' : '') +
+    (data.kind === 'guest' ? ' token--guest' : '');
+  token.draggable = true;
+  token.textContent = data.name;
+
+  if (data.isDriver) {
+    const badge = document.createElement('span');
+    badge.className = 'token-badge';
+    badge.textContent = 'D';
+    token.appendChild(badge);
+  }
+
+  // DnD
+  token.addEventListener('dragstart', e => {
+    dragData = { ...data };
+    token.classList.add('token--dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', data.name);
+  });
+  token.addEventListener('dragend', () => {
+    token.classList.remove('token--dragging');
+  });
+
+  // Tap-to-assign
+  token.addEventListener('click', e => {
+    e.stopPropagation();
+    if (selectedToken && selectedToken.name === data.name && selectedToken.kind === data.kind) {
+      // Deselect
+      selectedToken = null;
+      token.classList.remove('token--selected');
+    } else {
+      // Deselect any previously selected token by re-rendering bank
+      selectedToken = { ...data };
+      // Apply selected style — re-render will restore it
+      document.querySelectorAll('.token--selected').forEach(t => t.classList.remove('token--selected'));
+      token.classList.add('token--selected');
+    }
+  });
+
+  if (selectedToken && selectedToken.name === data.name && selectedToken.kind === data.kind) {
+    token.classList.add('token--selected');
+  }
+
+  return token;
+}
+
+// ── Location select ─────────────────────────────────────
 function renderLocationSelect() {
   const sel = document.getElementById('location-select');
   const usedNames = new Set(state.locations.map(l => l.location));
-  // Preserve first blank option
   while (sel.options.length > 1) sel.remove(1);
   state.pickupLocations.filter(l => !usedNames.has(l.name)).forEach(l => {
     const opt = document.createElement('option');
@@ -863,28 +1101,30 @@ document.getElementById('add-location-btn').addEventListener('click', () => {
   state.locations.push({ location: name, colour: locInfo.colour || '#333', cars: [] });
   renderLocationSelect();
   renderLocationsList();
+  renderBank();
   computeNeed();
   renderPreview();
 });
 
+// ── Locations list ──────────────────────────────────────
 function renderLocationsList() {
   const container = document.getElementById('locations-list');
   container.innerHTML = '';
   state.locations.forEach((loc, locIdx) => {
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = 'location-card';
 
     // Card header
     const head = document.createElement('div');
-    head.className = 'card-head';
-    const title = document.createElement('div');
-    title.className = 'card-title';
+    head.className = 'location-card-head';
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'card-title';
     const swatch = document.createElement('span');
     swatch.className = 'colour-swatch';
     swatch.style.background = loc.colour;
-    title.appendChild(swatch);
-    title.appendChild(document.createTextNode(loc.location));
-    head.appendChild(title);
+    titleDiv.appendChild(swatch);
+    titleDiv.appendChild(document.createTextNode(loc.location));
+    head.appendChild(titleDiv);
     const removeLocBtn = document.createElement('button');
     removeLocBtn.className = 'btn btn-sm btn-danger';
     removeLocBtn.textContent = '× Remove';
@@ -892,27 +1132,29 @@ function renderLocationsList() {
       state.locations.splice(locIdx, 1);
       renderLocationSelect();
       renderLocationsList();
+      renderBank();
       computeNeed();
       renderPreview();
     });
     head.appendChild(removeLocBtn);
     card.appendChild(head);
 
-    // Cars list
-    const carsDiv = document.createElement('div');
-    carsDiv.id = 'cars-' + locIdx;
+    // Cars
     loc.cars.forEach((car, carIdx) => {
-      carsDiv.appendChild(buildCarRow(locIdx, carIdx, car));
+      card.appendChild(buildCarCard(locIdx, carIdx, car));
     });
-    card.appendChild(carsDiv);
 
     // Add car button
     const addCarBtn = document.createElement('button');
-    addCarBtn.className = 'btn btn-sm';
+    addCarBtn.className = 'btn btn-sm add-car-btn';
     addCarBtn.textContent = '+ Add car';
     addCarBtn.addEventListener('click', () => {
-      state.locations[locIdx].cars.push({ _id: uid(), driver: '', driver_guest: false, guestName: '', vehicle: '', passengers: [] });
+      state.locations[locIdx].cars.push({
+        _id: uid(), driver: '', driver_guest: false,
+        guestName: '', vehicle: '', passengers: []
+      });
       renderLocationsList();
+      renderBank();
       computeNeed();
       renderPreview();
     });
@@ -922,62 +1164,14 @@ function renderLocationsList() {
   });
 }
 
-function buildCarRow(locIdx, carIdx, car) {
-  const row = document.createElement('div');
-  row.className = 'car-row';
+// ── Car card (replaces buildCarRow) ────────────────────
+function buildCarCard(locIdx, carIdx, car) {
+  const cardEl = document.createElement('div');
+  cardEl.className = 'car-card';
 
-  // Head: driver + vehicle + remove car
-  const rowHead = document.createElement('div');
-  rowHead.className = 'car-row-head';
-
-  // Driver field
-  const driverField = document.createElement('div');
-  driverField.className = 'field';
-  const driverLabel = document.createElement('label');
-  driverLabel.textContent = 'Driver';
-  driverField.appendChild(driverLabel);
-
-  const driverSel = document.createElement('select');
-  // Populate driver options
-  populateDriverSelect(driverSel, car);
-  driverSel.addEventListener('change', function() {
-    if (this.value === '__guest__') {
-      car.driver_guest = true;
-      car.driver = car.guestName || '';
-      guestInput.style.display = 'block';
-    } else {
-      car.driver_guest = false;
-      car.driver = this.value;
-      guestInput.style.display = 'none';
-    }
-    refreshAllPassengerSelects();
-    computeNeed();
-    renderPreview();
-  });
-  driverField.appendChild(driverSel);
-
-  // Guest name input
-  const guestInput = document.createElement('input');
-  guestInput.type = 'text';
-  guestInput.placeholder = 'Guest driver name';
-  guestInput.style.display = car.driver_guest ? 'block' : 'none';
-  guestInput.style.marginTop = '.3rem';
-  guestInput.value = car.driver_guest ? car.driver : '';
-  guestInput.addEventListener('input', function() {
-    car.driver = this.value.trim();
-    car.guestName = this.value.trim();
-    renderPreview();
-  });
-  driverField.appendChild(guestInput);
-
-  rowHead.appendChild(driverField);
-
-  // Vehicle field
-  const vehicleField = document.createElement('div');
-  vehicleField.className = 'field';
-  const vehicleLabel = document.createElement('label');
-  vehicleLabel.textContent = 'Vehicle';
-  vehicleField.appendChild(vehicleLabel);
+  // Head: vehicle select + remove button
+  const head = document.createElement('div');
+  head.className = 'car-card-head';
 
   const vehicleSel = document.createElement('select');
   const personalOpt = document.createElement('option');
@@ -996,224 +1190,188 @@ function buildCarRow(locIdx, carIdx, car) {
     checkVehicleConflicts();
     renderPreview();
   });
-  vehicleField.appendChild(vehicleSel);
-  rowHead.appendChild(vehicleField);
+  head.appendChild(vehicleSel);
 
-  // Remove car button
   const removeCarBtn = document.createElement('button');
   removeCarBtn.className = 'btn btn-sm btn-danger';
   removeCarBtn.textContent = '× Remove car';
-  removeCarBtn.style.marginBottom = '.8rem';
   removeCarBtn.addEventListener('click', () => {
+    // Return placed members to bank
     state.locations[locIdx].cars.splice(carIdx, 1);
     renderLocationsList();
+    renderBank();
     computeNeed();
     renderPreview();
   });
-  rowHead.appendChild(removeCarBtn);
+  head.appendChild(removeCarBtn);
+  cardEl.appendChild(head);
 
-  row.appendChild(rowHead);
+  // Zones grid
+  const zonesGrid = document.createElement('div');
+  zonesGrid.className = 'car-zones';
 
-  // Passengers
-  const passLabel = document.createElement('label');
-  passLabel.style.cssText = 'font-size:.72rem;letter-spacing:.08em;color:#888;text-transform:uppercase;display:block;margin-bottom:.3rem;';
+  // ── Driver drop zone ──
+  const driverZone = document.createElement('div');
+  driverZone.className = 'drop-zone drop-zone--driver';
+
+  const driverLabel = document.createElement('span');
+  driverLabel.className = 'drop-zone-label';
+  driverLabel.textContent = 'Driver';
+  driverZone.appendChild(driverLabel);
+
+  if (car.driver) {
+    driverZone.appendChild(makePlacedToken(car.driver, car.driver_guest, () => {
+      removeFromState(car.driver);
+      renderLocationsList();
+      renderBank();
+      computeNeed();
+      renderPreview();
+    }));
+
+    // Warn if assigned roster member is not a driver
+    if (!car.driver_guest) {
+      const m = state.members.find(x => x.short_name === car.driver);
+      if (m && !m.can_drive) {
+        const note = document.createElement('span');
+        note.className = 'zone-note zone-note--warn';
+        note.textContent = 'not marked as a driver';
+        driverZone.appendChild(note);
+      }
+    }
+  }
+
+  attachDropZone(driverZone, 'driver', locIdx, carIdx);
+  zonesGrid.appendChild(driverZone);
+
+  // ── Passengers drop zone ──
+  const passZone = document.createElement('div');
+  passZone.className = 'drop-zone';
+
+  const passLabel = document.createElement('span');
+  passLabel.className = 'drop-zone-label';
   passLabel.textContent = 'Passengers';
-  row.appendChild(passLabel);
+  passZone.appendChild(passLabel);
 
-  const chipsList = document.createElement('div');
-  chipsList.className = 'passengers-list';
   car.passengers.forEach((p, pIdx) => {
-    chipsList.appendChild(buildPassengerChip(p, () => {
+    passZone.appendChild(makePlacedToken(p.name, p.guest, () => {
       car.passengers.splice(pIdx, 1);
       renderLocationsList();
+      renderBank();
       computeNeed();
       renderPreview();
     }));
   });
-  row.appendChild(chipsList);
 
-  // Add passenger row
-  const addPassRow = document.createElement('div');
-  addPassRow.className = 'add-passenger-row';
+  attachDropZone(passZone, 'passenger', locIdx, carIdx);
+  zonesGrid.appendChild(passZone);
 
-  const passSel = document.createElement('select');
-  passSel.className = 'field';
-  passSel.style.margin = '0';
-  populatePassengerSelect(passSel, car);
-
-  const guestPassInput = document.createElement('input');
-  guestPassInput.type = 'text';
-  guestPassInput.placeholder = 'Guest name';
-  guestPassInput.style.cssText = 'display:none;background:#1a1a1a;border:1px solid #333;border-radius:4px;color:#e8e8e8;padding:.45rem .65rem;font-size:.88rem;font-family:inherit;flex:1;';
-
-  passSel.addEventListener('change', function() {
-    guestPassInput.style.display = (this.value === '__guest__') ? 'block' : 'none';
-  });
-
-  const addPassBtn = document.createElement('button');
-  addPassBtn.className = 'btn btn-sm';
-  addPassBtn.textContent = 'Add';
-  addPassBtn.addEventListener('click', () => {
-    const val = passSel.value;
-    if (!val) return;
-    if (val === '__guest__') {
-      const gName = guestPassInput.value.trim();
-      if (!gName) return;
-      car.passengers.push({ name: gName, guest: true });
-      guestPassInput.value = '';
-    } else {
-      if (car.passengers.some(p => p.name === val)) return;
-      car.passengers.push({ name: val, guest: false });
-    }
-    renderLocationsList();
-    computeNeed();
-    renderPreview();
-  });
-
-  const pf = document.createElement('div');
-  pf.className = 'field';
-  pf.style.margin = '0';
-  pf.style.flex = '1';
-  pf.appendChild(passSel);
-  addPassRow.appendChild(pf);
-  addPassRow.appendChild(guestPassInput);
-  addPassRow.appendChild(addPassBtn);
-  row.appendChild(addPassRow);
-
-  return row;
+  cardEl.appendChild(zonesGrid);
+  return cardEl;
 }
 
-function populateDriverSelect(sel, car) {
-  sel.innerHTML = '';
-  const blank = document.createElement('option');
-  blank.value = '';
-  blank.textContent = '— Select driver —';
-  sel.appendChild(blank);
+// ── Build a placed token (inside a drop zone) ───────────
+function makePlacedToken(name, isGuest, onRemove) {
+  const placed = document.createElement('span');
+  placed.className = 'placed';
+  placed.draggable = true;
+  placed.textContent = name + (isGuest ? ' (G)' : '');
 
-  // Drivers: can_drive members not assigned elsewhere (except the current driver)
-  const taken = assignedNames();
-  state.members.filter(m => m.can_drive).forEach(m => {
-    if (!taken.has(m.short_name) || m.short_name === car.driver) {
-      const opt = document.createElement('option');
-      opt.value = m.short_name;
-      opt.textContent = m.short_name;
-      sel.appendChild(opt);
-    }
-  });
-
-  // Guest option
-  const guestOpt = document.createElement('option');
-  guestOpt.value = '__guest__';
-  guestOpt.textContent = 'Guest…';
-  sel.appendChild(guestOpt);
-
-  sel.value = car.driver_guest ? '__guest__' : (car.driver || '');
-}
-
-function populatePassengerSelect(sel, car) {
-  sel.innerHTML = '';
-  const blank = document.createElement('option');
-  blank.value = '';
-  blank.textContent = '— Add passenger —';
-  sel.appendChild(blank);
-
-  const taken = assignedNames();
-  // Current car's own passengers are already chips; remove them from "taken"
-  // check — they can't be re-added anyway as chips exist
-  state.members.forEach(m => {
-    if (!taken.has(m.short_name)) {
-      const opt = document.createElement('option');
-      opt.value = m.short_name;
-      opt.textContent = m.short_name;
-      sel.appendChild(opt);
-    }
-  });
-
-  const guestOpt = document.createElement('option');
-  guestOpt.value = '__guest__';
-  guestOpt.textContent = 'Guest…';
-  sel.appendChild(guestOpt);
-}
-
-function refreshAllPassengerSelects() {
-  // Re-render is handled by renderLocationsList when needed;
-  // this is called after a driver change to refresh other selects.
-  // A full re-render keeps things simple.
-  renderLocationsList();
-}
-
-function buildPassengerChip(p, onRemove) {
-  const chip = document.createElement('span');
-  chip.className = 'chip';
-  chip.textContent = p.name + (p.guest ? ' (G)' : '');
-  const rm = document.createElement('span');
-  rm.className = 'chip-remove';
+  const rm = document.createElement('button');
+  rm.className = 'placed-remove';
+  rm.type = 'button';
   rm.textContent = '×';
-  rm.addEventListener('click', onRemove);
-  chip.appendChild(rm);
-  return chip;
+  rm.title = 'Remove';
+  rm.addEventListener('click', e => {
+    e.stopPropagation();
+    onRemove();
+  });
+  placed.appendChild(rm);
+
+  // Dragging a placed token back to bank (or to another zone)
+  placed.addEventListener('dragstart', e => {
+    dragData = {
+      kind: isGuest ? 'guest' : 'member',
+      name,
+      isDriver: false,
+    };
+    placed.style.opacity = '.4';
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', name);
+  });
+  placed.addEventListener('dragend', () => {
+    placed.style.opacity = '';
+  });
+
+  return placed;
 }
 
-// ── Own Way ────────────────────────────────────────────
+// ── Own Way list ────────────────────────────────────────
 function renderOwnWayList() {
-  const list = document.getElementById('own-way-list');
-  list.innerHTML = '';
+  const zone = document.getElementById('own-way-list');
+  zone.innerHTML = '';
+
+  // Keep the drop-zone label if empty
+  const labelSpan = document.createElement('span');
+  labelSpan.className = 'drop-zone-label';
+  labelSpan.textContent = 'Drop members here — or tap a token then click this zone';
+  zone.appendChild(labelSpan);
+
   state.ownWay.forEach((ow, idx) => {
-    const item = document.createElement('div');
-    item.className = 'own-way-item';
-    const modeLabel = { to: 'To', return: 'Return', both: 'Both' }[ow.mode] || ow.mode;
-    item.textContent = ow.name + ' — ' + modeLabel;
+    const chip = document.createElement('span');
+    chip.className = 'ownway-chip';
+    chip.textContent = ow.name + ' ';
+
+    // Mode toggle
+    const toggle = document.createElement('span');
+    toggle.className = 'mode-toggle';
+
+    ['to', 'return', 'both'].forEach(mode => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = mode === 'to' ? 'To' : mode === 'return' ? 'Return' : 'Both';
+      if (ow.mode === mode) btn.classList.add('active');
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        ow.mode = mode;
+        renderOwnWayList();
+        renderPreview();
+      });
+      toggle.appendChild(btn);
+    });
+    chip.appendChild(toggle);
+
     const rm = document.createElement('button');
-    rm.className = 'btn btn-sm btn-ghost';
+    rm.type = 'button';
+    rm.className = 'placed-remove';
     rm.textContent = '×';
-    rm.style.marginLeft = '.5rem';
-    rm.addEventListener('click', () => {
+    rm.title = 'Remove';
+    rm.addEventListener('click', e => {
+      e.stopPropagation();
       state.ownWay.splice(idx, 1);
       renderOwnWayList();
-      populateOwnWaySelect();
+      renderBank();
       computeNeed();
       renderPreview();
     });
-    item.appendChild(rm);
-    list.appendChild(item);
+    chip.appendChild(rm);
+
+    zone.appendChild(chip);
   });
+
+  // Note: the own-way zone DnD/tap handlers are wired once in initBankHandlers().
 }
 
-function populateOwnWaySelect() {
-  const sel = document.getElementById('ow-member-select');
-  const owNames = new Set(state.ownWay.map(o => o.name));
-  const taken = assignedNames();
-  sel.innerHTML = '<option value="">— Select member —</option>';
-  state.members.forEach(m => {
-    if (!owNames.has(m.short_name) && !taken.has(m.short_name)) {
-      const opt = document.createElement('option');
-      opt.value = m.short_name;
-      opt.textContent = m.short_name;
-      sel.appendChild(opt);
-    }
-  });
-}
+// ── Bank handlers wired once on DOMContentLoaded ───────
+// (filter input, guest button, and bank drop target are all initialised
+//  by initBankHandlers(), called from showApp() → initApp()).
 
-document.getElementById('add-ow-btn').addEventListener('click', () => {
-  const sel = document.getElementById('ow-member-select');
-  const modeSel = document.getElementById('ow-mode-select');
-  const name = sel.value;
-  if (!name) return;
-  state.ownWay.push({ name, mode: modeSel.value });
-  renderOwnWayList();
-  populateOwnWaySelect();
-  computeNeed();
-  renderPreview();
-});
-
-// ── Need tally ─────────────────────────────────────────
+// ── Need tally ──────────────────────────────────────────
 function computeNeed() {
   let sw = 0, sm = 0, c = 0;
   const counted = new Set();
 
   for (const loc of state.locations) {
     for (const car of loc.cars) {
-      // Count driver
       if (car.driver && !car.driver_guest) {
         const m = state.members.find(x => x.short_name === car.driver);
         if (m && !counted.has(m.short_name)) {
@@ -1223,7 +1381,6 @@ function computeNeed() {
           else if (m.squad === 'Cox') c++;
         }
       }
-      // Count passengers
       for (const p of car.passengers) {
         if (!p.guest) {
           const m = state.members.find(x => x.short_name === p.name);
@@ -1246,7 +1403,7 @@ function computeNeed() {
   document.getElementById('need-total').textContent = total;
 }
 
-// ── Vehicle conflict check ─────────────────────────────
+// ── Vehicle conflict check ──────────────────────────────
 function checkVehicleConflicts() {
   const msgEl = document.getElementById('plan-msg');
   const vehicleCodes = {};
@@ -1263,7 +1420,7 @@ function checkVehicleConflicts() {
   }
 }
 
-// ── Action buttons ─────────────────────────────────────
+// ── Action buttons ──────────────────────────────────────
 function updateActionButtons() {
   const hasDate = !!state.sessionDate;
   document.getElementById('save-draft-btn').disabled = !hasDate;
@@ -1272,7 +1429,6 @@ function updateActionButtons() {
 }
 
 function buildPlanData() {
-  // Compute need values
   let sw = parseInt(document.getElementById('need-sw').textContent, 10) || 0;
   let sm = parseInt(document.getElementById('need-sm').textContent, 10) || 0;
   let c  = parseInt(document.getElementById('need-c').textContent, 10) || 0;
@@ -1296,7 +1452,6 @@ function buildPlanData() {
 }
 
 function validatePlan() {
-  // Check for member appearing in >1 car
   const seen = {};
   for (const loc of state.locations) {
     for (const car of loc.cars) {
@@ -1392,9 +1547,8 @@ function downloadCsv(csv, filename) {
   URL.revokeObjectURL(url);
 }
 
-// ── CSV builder ────────────────────────────────────────
+// ── CSV builder ─────────────────────────────────────────
 function buildCsv(plans) {
-  // Load all active members (use state.allMembers if available, else state.members)
   const allMembers = state.allMembers.length ? state.allMembers : state.members;
   const settings = state.settings;
 
@@ -1402,10 +1556,8 @@ function buildCsv(plans) {
   const pdc = parseFloat(settings.personal_drive_credit)  || 0;
   const cdv = parseFloat(settings.club_drive_value)       || 0;
 
-  // Squad order
   const squadOrder = ['SW', 'SM', 'Cox', null];
 
-  // Determine code for a member (short_name) in a plan
   function codeForMember(shortName, planData) {
     const data = planData || {};
     for (const loc of (data.locations || [])) {
@@ -1421,7 +1573,6 @@ function buildCsv(plans) {
     return '';
   }
 
-  // Collect all guest names across plans
   const guestNames = new Set();
   for (const plan of plans) {
     const data = plan.data || {};
@@ -1435,7 +1586,6 @@ function buildCsv(plans) {
     }
   }
 
-  // Group members by squad
   const grouped = {};
   for (const sq of squadOrder) grouped[sq === null ? '__null__' : sq] = [];
   for (const m of allMembers) {
@@ -1444,13 +1594,9 @@ function buildCsv(plans) {
     else grouped['__null__'].push(m);
   }
 
-  // Date headers
   const dateHeaders = plans.map(p => fmtDateCol(p.session_date));
 
-  // Build rows
   const rows = [];
-
-  // Header
   rows.push(['Athlete', 'Student Number', ...dateHeaders, 'Total', 'Total Charge (£)', 'Total Credit (£)']);
 
   function addMemberRows(memberList, isGuest) {
@@ -1459,7 +1605,6 @@ function buildCsv(plans) {
       const studentNo = isGuest ? '' : (m.student_number || '');
       const codes = plans.map(plan => {
         if (isGuest) {
-          // Match guest name in plan
           const data = plan.data || {};
           for (const loc of (data.locations || [])) {
             for (const car of (loc.cars || [])) {
@@ -1484,35 +1629,30 @@ function buildCsv(plans) {
     }
   }
 
-  // Squad group headers + members
   const squadLabels = { SW: 'Senior Women', SM: 'Senior Men', Cox: 'Coxes', '__null__': 'Other' };
   for (const sq of [...squadOrder.map(s => s === null ? '__null__' : s)]) {
     const members = grouped[sq];
     if (!members || members.length === 0) continue;
-    // Group label row
     rows.push([squadLabels[sq] || sq, ...Array(dateHeaders.length + 4).fill('')]);
     addMemberRows(members, false);
   }
 
-  // Guests group
   if (guestNames.size > 0) {
     rows.push(['Guests', ...Array(dateHeaders.length + 4).fill('')]);
     addMemberRows([...guestNames], true);
   }
 
-  // Serialise
   return rows.map(row => row.map(csvField).join(',')).join('\r\n');
 }
 
-// ── Plan Preview ───────────────────────────────────────
+// ── Plan Preview ────────────────────────────────────────
 function renderPreview() {
   const container = document.getElementById('plan-preview');
   if (!state.locations.length && !state.ownWay.length) {
-    container.innerHTML = '<p style="color:#555;font-size:.82rem;">Add locations to see a preview.</p>';
+    container.innerHTML = '<p style="color:var(--muted);font-size:.82rem;">Add locations to see a preview.</p>';
     return;
   }
 
-  // Flatten all cars into columns
   const allCars = [];
   for (const loc of state.locations) {
     for (const car of loc.cars) {
@@ -1597,7 +1737,7 @@ function renderPreview() {
     table.appendChild(makeRow('Driver', driverCells));
   }
 
-  // Passengers row — find max passenger count
+  // Passengers rows
   const maxP = allCars.reduce((m, { car }) => Math.max(m, car.passengers.length), 0);
   for (let i = 0; i < Math.max(maxP, 1); i++) {
     const cells = allCars.map(({ car }) => {
@@ -1626,11 +1766,10 @@ function renderPreview() {
     [['SW',sw],['SM',sm],['C',c],['B',b],['Total',total]].forEach(([lbl,val]) => {
       const cell = document.createElement('td');
       cell.style.textAlign = 'center';
-      cell.innerHTML = '<small style="color:#888;display:block;font-size:.7rem;">' + lbl + '</small>' + val;
+      cell.innerHTML = '<small style="color:var(--muted);display:block;font-size:.7rem;">' + lbl + '</small>' + val;
       tr.appendChild(cell);
     });
 
-    // Pad remaining
     const extra = totalCols - 5;
     if (extra > 0) {
       const pad = document.createElement('td');
@@ -1654,7 +1793,7 @@ function renderPreview() {
     }
     [['To', modeGroups.to], ['Return', modeGroups.return], ['Both', modeGroups.both]].forEach(([lbl, names]) => {
       const cell = document.createElement('td');
-      cell.innerHTML = '<small style="color:#888;display:block;">' + lbl + '</small>' + names.join(', ');
+      cell.innerHTML = '<small style="color:var(--muted);display:block;">' + lbl + '</small>' + names.join(', ');
       tr.appendChild(cell);
     });
     table.appendChild(tr);
@@ -1664,7 +1803,7 @@ function renderPreview() {
   container.appendChild(table);
 }
 
-// ── Roster Tab ─────────────────────────────────────────
+// ── Roster Tab ──────────────────────────────────────────
 async function loadRoster() {
   try {
     const [members, locs] = await Promise.all([
@@ -1688,7 +1827,7 @@ function renderRoster() {
     const tr = document.createElement('tr');
     const td = document.createElement('td');
     td.colSpan = 8;
-    td.style.color = '#555';
+    td.style.color = 'var(--muted)';
     td.style.textAlign = 'center';
     td.textContent = 'No members found.';
     tr.appendChild(td);
@@ -1712,7 +1851,6 @@ function renderRoster() {
       tr.appendChild(td);
     });
 
-    // Actions
     const actTd = document.createElement('td');
     actTd.className = 'actions';
 
@@ -1822,7 +1960,7 @@ document.getElementById('save-member-btn').addEventListener('click', async () =>
   }
 });
 
-// ── Bulk Import ────────────────────────────────────────
+// ── Bulk Import ──────────────────────────────────────────
 document.getElementById('bulk-parse-btn').addEventListener('click', () => {
   const raw = document.getElementById('bulk-paste').value;
   const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
@@ -1830,7 +1968,7 @@ document.getElementById('bulk-parse-btn').addEventListener('click', () => {
   for (const line of lines) {
     const parts = line.includes('\t') ? line.split('\t') : line.split(',');
     const [full_name, short_name, squad, student_number, pickup_location, can_drive_raw] = parts.map(p => p.trim());
-    if (!full_name || full_name.toLowerCase() === 'full_name') continue; // skip blank/header
+    if (!full_name || full_name.toLowerCase() === 'full_name') continue;
     const can_drive = /^(yes|true|1)$/i.test(can_drive_raw || '');
     rows.push({ full_name, short_name, squad: squad || null, student_number: student_number || null, pickup_location: pickup_location || null, can_drive, active: true });
   }
@@ -1850,7 +1988,6 @@ document.getElementById('bulk-parse-btn').addEventListener('click', () => {
   countEl.textContent = rows.length + ' row(s) parsed.';
   importBtn.disabled = false;
 
-  // Small preview table
   const tbl = document.createElement('table');
   tbl.className = 'roster';
   tbl.style.fontSize = '.75rem';
@@ -1877,7 +2014,7 @@ document.getElementById('bulk-parse-btn').addEventListener('click', () => {
     const tr = document.createElement('tr');
     const td = document.createElement('td');
     td.colSpan = 6;
-    td.style.color = '#666';
+    td.style.color = 'var(--muted)';
     td.textContent = '… and ' + (rows.length - 10) + ' more.';
     tr.appendChild(td);
     tbody.appendChild(tr);
@@ -1904,7 +2041,7 @@ document.getElementById('bulk-import-btn').addEventListener('click', async () =>
   }
 });
 
-// ── Settings Tab ───────────────────────────────────────
+// ── Settings Tab ────────────────────────────────────────
 async function loadSettings() {
   try {
     const s = await window.EUBC.getSettings();
@@ -1933,7 +2070,7 @@ document.getElementById('save-settings-btn').addEventListener('click', async () 
   }
 });
 
-// ── Boot ───────────────────────────────────────────────
+// ── Boot ────────────────────────────────────────────────
 checkAuth();
 </script>
 </body>
