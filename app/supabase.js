@@ -163,6 +163,36 @@
     );
   }
 
+  async function upsertPickupLocation(loc) {
+    if (loc.id) {
+      const { id, ...fields } = loc;
+      return unwrap(
+        await getClient()
+          .from('pickup_locations')
+          .update(fields)
+          .eq('id', id)
+          .select()
+          .single()
+      );
+    }
+    return unwrap(
+      await getClient()
+        .from('pickup_locations')
+        .insert(loc)
+        .select()
+        .single()
+    );
+  }
+
+  async function deletePickupLocation(id) {
+    return unwrap(
+      await getClient()
+        .from('pickup_locations')
+        .delete()
+        .eq('id', id)
+    );
+  }
+
   async function listClubVehicles() {
     return unwrap(
       await getClient()
@@ -293,6 +323,8 @@
 
     // Reference data
     listPickupLocations,
+    upsertPickupLocation,
+    deletePickupLocation,
     listClubVehicles,
 
     // Plans

@@ -162,32 +162,6 @@
       flex-shrink: 0;
     }
 
-    /* Need tally */
-    .need-tally {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      align-items: center;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      padding: .7rem 1rem;
-    }
-    .need-cell { display: flex; flex-direction: column; align-items: center; gap: .15rem; }
-    .need-cell label { font-size: .68rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
-    .need-cell span { font-size: 1.1rem; font-weight: 600; color: var(--text); }
-    .need-cell input[type="number"] {
-      width: 60px;
-      text-align: center;
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      color: var(--text);
-      padding: .25rem;
-      font-size: .9rem;
-      font-family: inherit;
-    }
-
     /* Plan preview */
     .plan-wrap { overflow-x: auto; margin-top: 1.2rem; }
     .plan-table {
@@ -441,19 +415,6 @@
           </div>
         </div>
 
-        <!-- Need Tally -->
-        <div class="section-head">Need</div>
-        <div class="need-tally">
-          <div class="need-cell"><label>SW</label><span id="need-sw">0</span></div>
-          <div class="need-cell"><label>SM</label><span id="need-sm">0</span></div>
-          <div class="need-cell"><label>C</label><span id="need-c">0</span></div>
-          <div class="need-cell">
-            <label>B</label>
-            <input type="number" id="need-b" value="0" min="0" />
-          </div>
-          <div class="need-cell"><label>Total</label><span id="need-total">0</span></div>
-        </div>
-
         <!-- Actions -->
         <div class="row-actions">
           <button class="btn btn-primary" id="save-draft-btn" disabled>Save draft</button>
@@ -550,22 +511,29 @@
   <!-- ── TAB 3: Settings ── -->
   <section class="panel" id="panel-settings">
 
-    <div class="section-head">Financial Settings</div>
-    <div class="settings-form card">
-      <div class="field">
-        <label>Passenger Charge (£ per trip)</label>
-        <input type="number" id="s-passenger-charge" step="0.01" min="0" placeholder="2.50" />
+    <div class="section-head">Pickup Locations</div>
+    <div style="overflow-x:auto;margin-bottom:1.5rem;">
+      <table class="roster" id="locations-settings-table">
+        <thead>
+          <tr>
+            <th>Colour</th>
+            <th>Name</th>
+            <th>Sort Order</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="locations-settings-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-head">Add Location</div>
+    <div class="card" style="max-width:400px;">
+      <div class="grid-2">
+        <div class="field"><label>Name</label><input type="text" id="s-loc-name" placeholder="Pleasance" /></div>
+        <div class="field"><label>Colour</label><input type="color" id="s-loc-colour" value="#3b82f6" /></div>
       </div>
-      <div class="field">
-        <label>Personal-Drive Credit (£ per trip)</label>
-        <input type="number" id="s-personal-drive-credit" step="0.01" min="0" placeholder="5.00" />
-      </div>
-      <div class="field">
-        <label>Club-Drive Value (£ per trip, driver credit for club vehicle)</label>
-        <input type="number" id="s-club-drive-value" step="0.01" min="0" placeholder="0.00" />
-      </div>
-      <button class="btn btn-primary" id="save-settings-btn">Save settings</button>
-      <p class="settings-note">These values feed the <strong>Total Charge</strong> and <strong>Total Credit</strong> columns in the treasurer CSV export. They can be refined at any time — re-export the CSV after updating to reflect new rates.</p>
+      <div class="field"><label>Sort Order</label><input type="number" id="s-loc-sort" value="0" min="0" /></div>
+      <button class="btn btn-primary" id="add-loc-btn">Add location</button>
       <div class="msg" id="settings-msg"></div>
     </div>
 
@@ -583,14 +551,15 @@ const state = {
   allMembers: [],      // for roster (all)
   pickupLocations: [], // [{name, sort_order, colour}]
   clubVehicles: [],    // [{code, name}]
-  settings: {},        // {passenger_charge, personal_drive_credit, club_drive_value}
 
   // Plan builder
   sessionDate: '',
   departureTime: '',
   locations: [],       // [{location, colour, cars:[{_id, driver, driver_guest, guestName, vehicle, passengers:[{name,guest}]}]}]
   ownWay: [],          // [{name, mode}]
-  needB: 0,
+  needSW: 0,
+  needSM: 0,
+  needC: 0,
 
   // Roster editing
   editingMemberId: null,
@@ -611,8 +580,6 @@ function showMsg(el, text, type) {
     el._t = setTimeout(() => { el.classList.remove('show'); }, 4000);
   }
 }
-
-function fmt2(n) { return Number(n).toFixed(2); }
 
 function parseDate(d) {
   const [y,m,day] = d.split('-').map(Number);
@@ -795,26 +762,24 @@ document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.add('active');
     document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
     if (tab.dataset.tab === 'roster') loadRoster();
-    if (tab.dataset.tab === 'settings') loadSettings();
+    if (tab.dataset.tab === 'settings') loadLocationSettings();
   });
 });
 
 // ── App init ───────────────────────────────────────────
 async function initApp() {
   try {
-    const [members, locs, vehicles, settings] = await Promise.all([
+    const [members, locs, vehicles] = await Promise.all([
       window.EUBC.listMembers({ activeOnly: true }),
       window.EUBC.listPickupLocations(),
       window.EUBC.listClubVehicles(),
-      window.EUBC.getSettings(),
     ]);
     state.members = members || [];
     state.pickupLocations = (locs || []).sort((a,b) => (a.sort_order||0) - (b.sort_order||0));
     state.clubVehicles = vehicles || [];
-    state.settings = settings || {};
     renderLocationSelect();
     populateMemberPickupSelect();
-    renderBuilder(); // populate the members bank + preview now that data is loaded
+    renderBuilder();
   } catch (e) {
     console.error('initApp error', e);
   }
@@ -844,17 +809,12 @@ document.getElementById('plan-time').addEventListener('input', function() {
   renderPreview();
 });
 
-document.getElementById('need-b').addEventListener('input', function() {
-  state.needB = parseInt(this.value, 10) || 0;
-  computeNeed();
-  renderPreview();
-});
-
 function resetBuilder() {
   state.locations = [];
   state.ownWay = [];
-  state.needB = 0;
-  document.getElementById('need-b').value = 0;
+  state.needSW = 0;
+  state.needSM = 0;
+  state.needC = 0;
   document.getElementById('plan-time').value = '';
   state.departureTime = '';
   selectedToken = null;
@@ -885,9 +845,6 @@ function loadPlanData(plan) {
     };
   });
   state.ownWay = (data.own_way || []).map(o => ({ name: o.name, mode: o.mode || 'both' }));
-  state.needB = (data.need && data.need.B) ? data.need.B : 0;
-  document.getElementById('need-b').value = state.needB;
-
   selectedToken = null;
   dragData = null;
   renderBuilder();
@@ -1395,12 +1352,9 @@ function computeNeed() {
     }
   }
 
-  const b = state.needB;
-  const total = sw + sm + c + b;
-  document.getElementById('need-sw').textContent = sw;
-  document.getElementById('need-sm').textContent = sm;
-  document.getElementById('need-c').textContent = c;
-  document.getElementById('need-total').textContent = total;
+  state.needSW = sw;
+  state.needSM = sm;
+  state.needC = c;
 }
 
 // ── Vehicle conflict check ──────────────────────────────
@@ -1429,11 +1383,10 @@ function updateActionButtons() {
 }
 
 function buildPlanData() {
-  let sw = parseInt(document.getElementById('need-sw').textContent, 10) || 0;
-  let sm = parseInt(document.getElementById('need-sm').textContent, 10) || 0;
-  let c  = parseInt(document.getElementById('need-c').textContent, 10) || 0;
-  let b  = state.needB;
-  let total = parseInt(document.getElementById('need-total').textContent, 10) || 0;
+  const sw = state.needSW || 0;
+  const sm = state.needSM || 0;
+  const c  = state.needC  || 0;
+  const total = sw + sm + c;
 
   return {
     locations: state.locations.map(loc => ({
@@ -1447,7 +1400,7 @@ function buildPlanData() {
       })),
     })),
     own_way: state.ownWay.map(o => ({ name: o.name, mode: o.mode })),
-    need: { SW: sw, SM: sm, C: c, B: b, total },
+    need: { SW: sw, SM: sm, C: c, total },
   };
 }
 
@@ -1550,11 +1503,6 @@ function downloadCsv(csv, filename) {
 // ── CSV builder ─────────────────────────────────────────
 function buildCsv(plans) {
   const allMembers = state.allMembers.length ? state.allMembers : state.members;
-  const settings = state.settings;
-
-  const pc  = parseFloat(settings.passenger_charge)       || 0;
-  const pdc = parseFloat(settings.personal_drive_credit)  || 0;
-  const cdv = parseFloat(settings.club_drive_value)       || 0;
 
   const squadOrder = ['SW', 'SM', 'Cox', null];
 
@@ -1597,7 +1545,7 @@ function buildCsv(plans) {
   const dateHeaders = plans.map(p => fmtDateCol(p.session_date));
 
   const rows = [];
-  rows.push(['Athlete', 'Student Number', ...dateHeaders, 'Total', 'Total Charge (£)', 'Total Credit (£)']);
+  rows.push(['Athlete', 'Student Number', ...dateHeaders]);
 
   function addMemberRows(memberList, isGuest) {
     for (const m of memberList) {
@@ -1619,13 +1567,7 @@ function buildCsv(plans) {
           return codeForMember(m.short_name, plan.data);
         }
       });
-      const pCount = codes.filter(x => x === 'p').length;
-      const dCount = codes.filter(x => x === 'd').length;
-      const vCount = codes.filter(x => x === 'v').length;
-      const total  = codes.filter(x => x !== '').length;
-      const charge = fmt2(pCount * pc);
-      const credit = fmt2(dCount * pdc + vCount * cdv);
-      rows.push([name, studentNo, ...codes, total, charge, credit]);
+      rows.push([name, studentNo, ...codes]);
     }
   }
 
@@ -1633,12 +1575,12 @@ function buildCsv(plans) {
   for (const sq of [...squadOrder.map(s => s === null ? '__null__' : s)]) {
     const members = grouped[sq];
     if (!members || members.length === 0) continue;
-    rows.push([squadLabels[sq] || sq, ...Array(dateHeaders.length + 4).fill('')]);
+    rows.push([squadLabels[sq] || sq, ...Array(dateHeaders.length + 1).fill('')]);
     addMemberRows(members, false);
   }
 
   if (guestNames.size > 0) {
-    rows.push(['Guests', ...Array(dateHeaders.length + 4).fill('')]);
+    rows.push(['Guests', ...Array(dateHeaders.length + 1).fill('')]);
     addMemberRows([...guestNames], true);
   }
 
@@ -1747,36 +1689,6 @@ function renderPreview() {
     if (cells.length === 0) cells.push(td(''));
     const label = i === 0 ? 'Passengers' : '';
     table.appendChild(makeRow(label, cells));
-  }
-
-  // Need row
-  {
-    const sw = parseInt(document.getElementById('need-sw').textContent, 10) || 0;
-    const sm = parseInt(document.getElementById('need-sm').textContent, 10) || 0;
-    const c  = parseInt(document.getElementById('need-c').textContent, 10) || 0;
-    const b  = state.needB;
-    const total = parseInt(document.getElementById('need-total').textContent, 10) || 0;
-
-    const tr = document.createElement('tr');
-    const th = document.createElement('th');
-    th.className = 'row-label';
-    th.textContent = 'Need';
-    tr.appendChild(th);
-
-    [['SW',sw],['SM',sm],['C',c],['B',b],['Total',total]].forEach(([lbl,val]) => {
-      const cell = document.createElement('td');
-      cell.style.textAlign = 'center';
-      cell.innerHTML = '<small style="color:var(--muted);display:block;font-size:.7rem;">' + lbl + '</small>' + val;
-      tr.appendChild(cell);
-    });
-
-    const extra = totalCols - 5;
-    if (extra > 0) {
-      const pad = document.createElement('td');
-      pad.colSpan = extra;
-      tr.appendChild(pad);
-    }
-    table.appendChild(tr);
   }
 
   // Own Way
@@ -2041,30 +1953,80 @@ document.getElementById('bulk-import-btn').addEventListener('click', async () =>
   }
 });
 
-// ── Settings Tab ────────────────────────────────────────
-async function loadSettings() {
+// ── Settings Tab — Location Management ─────────────────
+async function loadLocationSettings() {
   try {
-    const s = await window.EUBC.getSettings();
-    state.settings = s || {};
-    document.getElementById('s-passenger-charge').value     = s.passenger_charge       ?? '';
-    document.getElementById('s-personal-drive-credit').value = s.personal_drive_credit ?? '';
-    document.getElementById('s-club-drive-value').value     = s.club_drive_value        ?? '';
+    const locs = await window.EUBC.listPickupLocations();
+    state.pickupLocations = (locs || []).sort((a,b) => (a.sort_order||0) - (b.sort_order||0));
+    renderLocationSettings();
+    renderLocationSelect();
+    populateMemberPickupSelect();
   } catch (e) {
-    console.error('loadSettings error', e);
+    console.error('loadLocationSettings error', e);
   }
 }
 
-document.getElementById('save-settings-btn').addEventListener('click', async () => {
+function renderLocationSettings() {
+  const tbody = document.getElementById('locations-settings-tbody');
+  tbody.innerHTML = '';
+  if (!state.pickupLocations.length) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 4;
+    td.style.color = 'var(--muted)';
+    td.style.textAlign = 'center';
+    td.textContent = 'No locations defined.';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+  state.pickupLocations.forEach(loc => {
+    const tr = document.createElement('tr');
+
+    const swatchTd = document.createElement('td');
+    const swatch = document.createElement('span');
+    swatch.className = 'colour-swatch';
+    swatch.style.background = loc.colour || '#333';
+    swatchTd.appendChild(swatch);
+    tr.appendChild(swatchTd);
+
+    [loc.name, loc.sort_order ?? ''].forEach(val => {
+      const td = document.createElement('td');
+      td.textContent = val;
+      tr.appendChild(td);
+    });
+
+    const actTd = document.createElement('td');
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn btn-sm btn-danger';
+    delBtn.textContent = 'Delete';
+    delBtn.addEventListener('click', async () => {
+      if (!confirm('Delete location "' + loc.name + '"?')) return;
+      try {
+        await window.EUBC.deletePickupLocation(loc.id);
+        await loadLocationSettings();
+      } catch (e) {
+        showMsg(document.getElementById('settings-msg'), 'Error: ' + (e.message || e), 'err');
+      }
+    });
+    actTd.appendChild(delBtn);
+    tr.appendChild(actTd);
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById('add-loc-btn').addEventListener('click', async () => {
   const msgEl = document.getElementById('settings-msg');
-  const patch = {
-    passenger_charge:      parseFloat(document.getElementById('s-passenger-charge').value)       || 0,
-    personal_drive_credit: parseFloat(document.getElementById('s-personal-drive-credit').value)  || 0,
-    club_drive_value:      parseFloat(document.getElementById('s-club-drive-value').value)        || 0,
-  };
+  const name = document.getElementById('s-loc-name').value.trim();
+  if (!name) { showMsg(msgEl, 'Name is required.', 'err'); return; }
+  const colour = document.getElementById('s-loc-colour').value || '#3b82f6';
+  const sortOrder = parseInt(document.getElementById('s-loc-sort').value, 10) || 0;
   try {
-    await window.EUBC.updateSettings(patch);
-    state.settings = patch;
-    showMsg(msgEl, 'Settings saved.', 'ok');
+    await window.EUBC.upsertPickupLocation({ name, colour, sort_order: sortOrder });
+    document.getElementById('s-loc-name').value = '';
+    document.getElementById('s-loc-sort').value = '0';
+    showMsg(msgEl, 'Location added.', 'ok');
+    await loadLocationSettings();
   } catch (e) {
     showMsg(msgEl, 'Error: ' + (e.message || e), 'err');
   }
