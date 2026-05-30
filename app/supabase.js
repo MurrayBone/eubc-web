@@ -19,10 +19,11 @@
 
   function getClient() {
     if (!_client) {
-      _client = supabase.createClient(
-        EUBC_CONFIG.SUPABASE_URL,
-        EUBC_CONFIG.SUPABASE_ANON_KEY
-      );
+      // Strip any trailing slash/whitespace — a trailing "/" makes the client
+      // build "…supabase.co//rest/v1/…", which PostgREST rejects (PGRST125).
+      var url = String(EUBC_CONFIG.SUPABASE_URL || '').trim().replace(/\/+$/, '');
+      var key = String(EUBC_CONFIG.SUPABASE_ANON_KEY || '').trim();
+      _client = supabase.createClient(url, key);
     }
     return _client;
   }
