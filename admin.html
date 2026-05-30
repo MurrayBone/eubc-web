@@ -96,7 +96,7 @@
     /* Fields & forms */
     .field { display: flex; flex-direction: column; gap: .3rem; margin-bottom: .8rem; }
     .field label { font-size: .72rem; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
-    .field input, .field select, .field textarea {
+    .field input:not([type="checkbox"]):not([type="radio"]):not([type="color"]), .field select, .field textarea {
       background: var(--panel-2);
       border: 1px solid var(--line);
       border-radius: 4px;
@@ -107,7 +107,7 @@
       width: 100%;
       box-sizing: border-box;
     }
-    .field input:focus, .field select:focus, .field textarea:focus {
+    .field input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):focus, .field select:focus, .field textarea:focus {
       outline: none; border-color: var(--accent);
     }
     .field textarea { resize: vertical; min-height: 100px; }
