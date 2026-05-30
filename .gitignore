@@ -1,0 +1,8 @@
+# Reference screenshots contain member personal data — keep out of this public repo
+Transport Page/*.png
+Transport Page/*.jpg
+
+# Local Supabase credentials should not be committed if you split them out
+# (app/config.js ships with placeholders only; replace locally / via env)
+
+.DS_Store

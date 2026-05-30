@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Members — Edinburgh University Boat Club</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="app/eubc.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app/config.js"></script>
+  <script src="app/supabase.js"></script>
+</head>
+<body>
+
+  <!-- ── Gate ── -->
+  <div class="gate" id="gate">
+    <div class="gate-card">
+      <img src="EUBC_Logo(notext).png" class="crest" alt="EUBC Crest" />
+      <h1>Members</h1>
+      <div class="field">
+        <label for="pw-input">Password</label>
+        <input type="password" id="pw-input" autocomplete="current-password" placeholder="" />
+      </div>
+      <button class="btn btn-primary btn-block" id="enter-btn">Enter</button>
+      <p class="err" id="gate-err" hidden></p>
+    </div>
+  </div>
+
+  <!-- ── Plan view ── -->
+  <div id="plan-view" hidden>
+    <nav>
+      <a href="index.html" class="nav-logo">EUBC</a>
+      <button class="btn btn-ghost" id="logout-btn">Log out</button>
+    </nav>
+
+    <div class="container">
+      <div id="plan-output"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ── DOM refs ──────────────────────────────────────────────────────────
+      var gate      = document.getElementById('gate');
+      var planView  = document.getElementById('plan-view');
+      var pwInput   = document.getElementById('pw-input');
+      var enterBtn  = document.getElementById('enter-btn');
+      var gateErr   = document.getElementById('gate-err');
+      var logoutBtn = document.getElementById('logout-btn');
+      var planOut   = document.getElementById('plan-output');
+
+      // ── Helpers ───────────────────────────────────────────────────────────
+
+      function showErr(msg) {
+        gateErr.textContent = msg;
+        gateErr.hidden = false;
+      }
+
+      function hideErr() {
+        gateErr.hidden = true;
+      }
+
+      // "2026-05-23" → "23/05/2026"
+      function fmtDate(iso) {
+        if (!iso) return '';
+        var parts = iso.split('-');
+        if (parts.length !== 3) return iso;
+        return parts[2] + '/' + parts[1] + '/' + parts[0];
+      }
+
+      // ── Auth flow ─────────────────────────────────────────────────────────
+
+      async function tryLogin() {
+        var pw = pwInput.value.trim();
+        if (!pw) return;
+        enterBtn.disabled = true;
+        hideErr();
+        try {
+          await EUBC.signIn('member', pw);
+          await showPlanView();
+        } catch (e) {
+          showErr('Incorrect password.');
+        } finally {
+          enterBtn.disabled = false;
+        }
+      }
+
+      enterBtn.addEventListener('click', tryLogin);
+      pwInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') tryLogin();
+      });
+
+      logoutBtn.addEventListener('click', async function () {
+        try { await EUBC.signOut(); } catch (_) {}
+        window.location.reload();
+      });
+
+      // ── Plan rendering ────────────────────────────────────────────────────
+
+      function buildPlanHTML(plan) {
+        var data         = plan.data || {};
+        var locations    = data.locations  || [];
+        var ownWay       = data.own_way    || [];
+        var need         = data.need       || null;
+
+        // Count total cars across all locations
+        var totalCars = 0;
+        locations.forEach(function (loc) {
+          totalCars += (loc.cars || []).length;
+        });
+
+        if (totalCars === 0) {
+          return '<p class="msg" style="text-align:center;padding:2rem 0;">No cars in this plan.</p>';
+        }
+
+        var html = '<div class="plan-wrap"><table class="plan-table">';
+
+        // ── Row: Date ────────────────────────────────────────────────────────
+        html += '<tr>';
+        html += '<th class="row-label">Date</th>';
+        html += '<td colspan="' + totalCars + '" style="text-align:center;">' + fmtDate(plan.session_date) + '</td>';
+        html += '</tr>';
+
+        // ── Row: Departure Time ───────────────────────────────────────────────
+        html += '<tr>';
+        html += '<th class="row-label">Departure Time</th>';
+        html += '<td colspan="' + totalCars + '" style="text-align:center;">' + (plan.departure_time || '') + '</td>';
+        html += '</tr>';
+
+        // ── Row: Departure Location ───────────────────────────────────────────
+        html += '<tr>';
+        html += '<th class="row-label">Departure Location</th>';
+        locations.forEach(function (loc) {
+          var carCount = (loc.cars || []).length;
+          if (carCount === 0) return;
+          var colour = loc.colour || '';
+          html += '<td colspan="' + carCount + '" class="on-band" style="background:' + colour + ';text-align:center;font-weight:700;">';
+          html += escHtml(loc.location || '');
+          html += '</td>';
+        });
+        html += '</tr>';
+
+        // ── Row: Driver ───────────────────────────────────────────────────────
+        html += '<tr>';
+        html += '<th class="row-label">Driver</th>';
+        locations.forEach(function (loc) {
+          var colour = loc.colour || '';
+          (loc.cars || []).forEach(function (car) {
+            var label = car.vehicle
+              ? escHtml(car.vehicle) + ' - ' + escHtml(car.driver || '')
+              : escHtml(car.driver || '');
+            html += '<td class="on-band" style="background:' + colour + ';text-align:center;">';
+            html += label;
+            html += '</td>';
+          });
+        });
+        html += '</tr>';
+
+        // ── Row: Passengers ───────────────────────────────────────────────────
+        html += '<tr>';
+        html += '<th class="row-label">Passengers</th>';
+        locations.forEach(function (loc) {
+          var colour = loc.colour || '';
+          (loc.cars || []).forEach(function (car) {
+            var passengers = car.passengers || [];
+            html += '<td class="on-band" style="background:' + colour + ';vertical-align:top;">';
+            passengers.forEach(function (p) {
+              var name = typeof p === 'string' ? p : (p.name || '');
+              html += '<div>' + escHtml(name) + '</div>';
+            });
+            html += '</td>';
+          });
+        });
+        html += '</tr>';
+
+        html += '</table></div>';
+
+        // ── Bottom row: Need + Own Way ─────────────────────────────────────────
+        html += '<div style="display:flex;flex-wrap:wrap;gap:2rem;margin-top:1.5rem;align-items:flex-start;">';
+
+        // Need table
+        if (need) {
+          html += '<div>';
+          html += '<div class="plan-wrap"><table class="plan-table">';
+          html += '<tr>';
+          html += '<th class="row-label">Need</th>';
+          html += '<th style="text-align:center;">SW</th>';
+          html += '<th style="text-align:center;">SM</th>';
+          html += '<th style="text-align:center;">C</th>';
+          html += '<th style="text-align:center;">B</th>';
+          html += '<th style="text-align:center;">Total</th>';
+          html += '</tr>';
+          html += '<tr>';
+          html += '<td></td>';
+          html += '<td style="text-align:center;">' + (need.SW  != null ? need.SW  : '') + '</td>';
+          html += '<td style="text-align:center;">' + (need.SM  != null ? need.SM  : '') + '</td>';
+          html += '<td style="text-align:center;">' + (need.C   != null ? need.C   : '') + '</td>';
+          html += '<td style="text-align:center;">' + (need.B   != null ? need.B   : '') + '</td>';
+          html += '<td style="text-align:center;">' + (need.total != null ? need.total : '') + '</td>';
+          html += '</tr>';
+          html += '</table></div>';
+          html += '</div>';
+        }
+
+        // Own Way table
+        if (ownWay.length > 0) {
+          // Bucket names by mode
+          var toNames     = [];
+          var returnNames = [];
+          var bothNames   = [];
+          ownWay.forEach(function (item) {
+            var name = typeof item === 'string' ? item : (item.name || '');
+            var mode = (item.mode || '').toLowerCase();
+            if (mode === 'to')         toNames.push(name);
+            else if (mode === 'return') returnNames.push(name);
+            else                        bothNames.push(name);  // 'both' or unknown
+          });
+
+          var maxRows = Math.max(toNames.length, returnNames.length, bothNames.length);
+
+          html += '<div>';
+          html += '<div class="plan-wrap"><table class="plan-table">';
+          html += '<tr>';
+          html += '<th class="row-label">Own Way</th>';
+          html += '<th style="text-align:center;">To</th>';
+          html += '<th style="text-align:center;">Return</th>';
+          html += '<th style="text-align:center;">Both</th>';
+          html += '</tr>';
+
+          for (var i = 0; i < maxRows; i++) {
+            html += '<tr>';
+            html += '<td></td>';
+            html += '<td style="text-align:center;">' + escHtml(toNames[i]     || '') + '</td>';
+            html += '<td style="text-align:center;">' + escHtml(returnNames[i] || '') + '</td>';
+            html += '<td style="text-align:center;">' + escHtml(bothNames[i]   || '') + '</td>';
+            html += '</tr>';
+          }
+
+          if (maxRows === 0) {
+            html += '<tr><td></td><td></td><td></td><td></td></tr>';
+          }
+
+          html += '</table></div>';
+          html += '</div>';
+        }
+
+        html += '</div>'; // end bottom flex row
+
+        return html;
+      }
+
+      function escHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      async function showPlanView() {
+        gate.hidden = true;
+        planView.hidden = false;
+
+        try {
+          var plan = await EUBC.getLatestPublishedPlan();
+          if (!plan) {
+            planOut.innerHTML = '<p class="msg" style="text-align:center;padding:4rem 0;">No transport plan published yet.</p>';
+          } else {
+            planOut.innerHTML = buildPlanHTML(plan);
+          }
+        } catch (e) {
+          planOut.innerHTML = '<p class="msg err" style="text-align:center;padding:4rem 0;">Could not load transport plan. Please try again.</p>';
+        }
+      }
+
+      // ── Init ──────────────────────────────────────────────────────────────
+
+      async function init() {
+        try {
+          var session = await EUBC.getSession();
+          if (session) {
+            var role = await EUBC.getRole();
+            if (role === 'member' || role === 'admin') {
+              await showPlanView();
+              return;
+            }
+          }
+        } catch (_) {
+          // fall through to gate
+        }
+        gate.hidden = false;
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
