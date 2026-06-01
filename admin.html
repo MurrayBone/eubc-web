@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="app/eubc.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
   <script src="app/config.js"></script>
   <script src="app/supabase.js"></script>
   <style>
@@ -364,6 +365,7 @@
   <div class="tabs">
     <button class="tab active" data-tab="plan">Plan</button>
     <button class="tab" data-tab="roster">Roster</button>
+    <button class="tab" data-tab="history">History</button>
     <button class="tab" data-tab="settings">Settings</button>
   </div>
 
@@ -417,8 +419,8 @@
 
         <!-- Actions -->
         <div class="row-actions">
-          <button class="btn btn-primary" id="save-draft-btn" disabled>Save draft</button>
-          <button class="btn btn-primary" id="publish-btn" disabled>Publish</button>
+          <button class="btn btn-primary" id="save-btn" disabled>Save</button>
+          <button class="btn btn-primary" id="save-image-btn" disabled>Save image</button>
           <button class="btn" id="export-single-btn" disabled>Export CSV (this session)</button>
           <button class="btn" id="export-term-btn">Export CSV (term to date)</button>
         </div>
@@ -506,6 +508,24 @@
       <div class="msg" id="bulk-msg"></div>
     </div>
 
+  </section>
+
+  <!-- ── TAB: History ── -->
+  <section class="panel" id="panel-history">
+    <div class="section-head">Past transport</div>
+    <div style="overflow-x:auto;">
+      <table class="roster" id="history-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Departure Time</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="history-tbody"></tbody>
+      </table>
+    </div>
+    <div class="msg" id="history-msg"></div>
   </section>
 
   <!-- ── TAB 3: Settings ── -->
@@ -762,6 +782,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.add('active');
     document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
     if (tab.dataset.tab === 'roster') loadRoster();
+    if (tab.dataset.tab === 'history') loadHistory();
     if (tab.dataset.tab === 'settings') loadLocationSettings();
   });
 });
@@ -1377,8 +1398,8 @@ function checkVehicleConflicts() {
 // ── Action buttons ──────────────────────────────────────
 function updateActionButtons() {
   const hasDate = !!state.sessionDate;
-  document.getElementById('save-draft-btn').disabled = !hasDate;
-  document.getElementById('publish-btn').disabled = !hasDate;
+  document.getElementById('save-btn').disabled = !hasDate;
+  document.getElementById('save-image-btn').disabled = !hasDate;
   document.getElementById('export-single-btn').disabled = !hasDate;
 }
 
@@ -1423,24 +1444,7 @@ function validatePlan() {
   return null;
 }
 
-document.getElementById('save-draft-btn').addEventListener('click', async () => {
-  const msgEl = document.getElementById('plan-msg');
-  const err = validatePlan();
-  if (err) { showMsg(msgEl, err, 'err'); return; }
-  try {
-    await window.EUBC.savePlan({
-      session_date: state.sessionDate,
-      departure_time: state.departureTime,
-      data: buildPlanData(),
-      published: false,
-    });
-    showMsg(msgEl, 'Saved.', 'ok');
-  } catch (e) {
-    showMsg(msgEl, 'Save failed: ' + (e.message || e), 'err');
-  }
-});
-
-document.getElementById('publish-btn').addEventListener('click', async () => {
+document.getElementById('save-btn').addEventListener('click', async () => {
   const msgEl = document.getElementById('plan-msg');
   const err = validatePlan();
   if (err) { showMsg(msgEl, err, 'err'); return; }
@@ -1451,9 +1455,78 @@ document.getElementById('publish-btn').addEventListener('click', async () => {
       data: buildPlanData(),
       published: true,
     });
-    showMsg(msgEl, 'Published — members can now see it.', 'ok');
+    showMsg(msgEl, 'Saved.', 'ok');
   } catch (e) {
-    showMsg(msgEl, 'Publish failed: ' + (e.message || e), 'err');
+    showMsg(msgEl, 'Save failed: ' + (e.message || e), 'err');
+  }
+});
+
+// ── Save / share image (for WhatsApp) ───────────────────
+// Renders the roster onto a clean light background, then offers it via the
+// device share sheet (phone → WhatsApp) or downloads it (desktop fallback).
+function buildImageNode() {
+  const table = document.querySelector('#plan-preview .plan-table');
+  if (!table) return null;
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;left:-9999px;top:0;background:#ffffff;color:#111;'
+    + 'padding:24px;font-family:Inter,system-ui,sans-serif;width:max-content;';
+
+  const heading = document.createElement('div');
+  heading.style.cssText = 'font-weight:700;font-size:20px;margin-bottom:4px;color:#111;';
+  heading.textContent = 'EUBC Transport';
+  const sub = document.createElement('div');
+  sub.style.cssText = 'font-size:14px;color:#444;margin-bottom:16px;';
+  sub.textContent = [state.sessionDate, state.departureTime].filter(Boolean).join(' · ');
+
+  const clone = table.cloneNode(true);
+  // Light theme for the cloned table (location colour bands are inline styles
+  // on the cells, so they survive the clone and stay readable on white).
+  clone.style.cssText = 'border-collapse:collapse;font-size:14px;color:#111;background:#fff;';
+  clone.querySelectorAll('th, td').forEach(cell => {
+    cell.style.border = '1px solid #ccc';
+    cell.style.padding = '6px 10px';
+    if (cell.classList.contains('row-label')) {
+      cell.style.background = '#f2f2f2';
+      cell.style.color = '#333';
+      cell.style.fontWeight = '600';
+    }
+  });
+
+  wrap.appendChild(heading);
+  wrap.appendChild(sub);
+  wrap.appendChild(clone);
+  return wrap;
+}
+
+document.getElementById('save-image-btn').addEventListener('click', async () => {
+  const msgEl = document.getElementById('plan-msg');
+  const err = validatePlan();
+  if (err) { showMsg(msgEl, err, 'err'); return; }
+  const node = buildImageNode();
+  if (!node) { showMsg(msgEl, 'Nothing to capture yet.', 'err'); return; }
+  document.body.appendChild(node);
+  try {
+    const blob = await htmlToImage.toBlob(node, { backgroundColor: '#ffffff', pixelRatio: 2 });
+    const file = new File([blob], 'eubc-transport-' + (state.sessionDate || 'plan') + '.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'EUBC Transport', text: 'Transport ' + (state.sessionDate || '') });
+    } else {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showMsg(msgEl, 'Image downloaded — attach it in WhatsApp.', 'ok');
+    }
+  } catch (e) {
+    if (e && e.name === 'AbortError') { /* user dismissed the share sheet */ }
+    else { showMsg(msgEl, 'Image failed: ' + (e.message || e), 'err'); }
+  } finally {
+    node.remove();
   }
 });
 
@@ -1729,6 +1802,54 @@ async function loadRoster() {
   } catch (e) {
     console.error('loadRoster error', e);
   }
+}
+
+// ── History — past transport plans ──────────────────────
+async function loadHistory() {
+  const tbody = document.getElementById('history-tbody');
+  const msgEl = document.getElementById('history-msg');
+  tbody.innerHTML = '';
+  try {
+    const plans = await window.EUBC.listPlans();   // already ordered session_date DESC
+    if (!plans || !plans.length) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 3;
+      td.style.color = 'var(--muted)';
+      td.style.textAlign = 'center';
+      td.textContent = 'No saved transport yet.';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+    plans.forEach(plan => {
+      const tr = document.createElement('tr');
+      const dateTd = document.createElement('td');
+      dateTd.textContent = plan.session_date;
+      const timeTd = document.createElement('td');
+      timeTd.textContent = plan.departure_time || '—';
+      const actTd = document.createElement('td');
+      const viewBtn = document.createElement('button');
+      viewBtn.className = 'btn btn-sm btn-primary';
+      viewBtn.textContent = 'View';
+      viewBtn.addEventListener('click', () => viewHistoryPlan(plan.session_date));
+      actTd.appendChild(viewBtn);
+      tr.appendChild(dateTd);
+      tr.appendChild(timeTd);
+      tr.appendChild(actTd);
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    showMsg(msgEl, 'Could not load history: ' + (e.message || e), 'err');
+  }
+}
+
+// Load a past day's plan into the Plan tab (reuses the date-change loader).
+function viewHistoryPlan(date) {
+  const dateInput = document.getElementById('plan-date');
+  dateInput.value = date;
+  document.querySelector('.tab[data-tab="plan"]').click();
+  dateInput.dispatchEvent(new Event('change'));
 }
 
 function renderRoster() {

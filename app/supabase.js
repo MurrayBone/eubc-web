@@ -39,10 +39,7 @@
   // --------------------------------------------------------------------------
 
   async function signIn(role, password) {
-    const email =
-      role === 'admin'
-        ? EUBC_CONFIG.ADMIN_EMAIL
-        : EUBC_CONFIG.MEMBER_EMAIL;
+    const email = EUBC_CONFIG.ADMIN_EMAIL;
     return unwrap(
       await getClient().auth.signInWithPassword({ email, password })
     );

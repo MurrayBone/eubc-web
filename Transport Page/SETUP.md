@@ -27,23 +27,18 @@ Keep these two values handy; you'll need them in Step 4.
 
 ---
 
-## Step 3 — Create the two login users
+## Step 3 — Create the admin login user
 
-The app uses two shared accounts: one for the whole squad, one for the secretary / admin.
+The app uses a single shared account for the secretary / admin.
 
 1. In the left sidebar, click **Authentication** → **Users** → **Add user** → **Create new user**.
-2. Create the **members account**:
-   - Email: `members@eubc.local`
-   - Password: choose a password and share it with the squad (e.g. via your group chat)
-   - **Tick "Auto Confirm User"** — this skips the email-verification step, which would fail because `@eubc.local` is not a real email domain.
-   - Click **Create user**.
-3. Create the **admin account**:
+2. Create the **admin account**:
    - Email: `admin@eubc.local`
    - Password: choose a strong password and keep it private (secretary / treasurer only)
-   - **Tick "Auto Confirm User"** again.
+   - **Tick "Auto Confirm User"** — this skips the email-verification step, which would fail because `@eubc.local` is not a real email domain.
    - Click **Create user**.
 
-> **How roles work:** The database trigger you ran in Step 2 automatically gives `admin@eubc.local` the admin role and every other account the member role. You do not need to configure this manually.
+> **How roles work:** The database trigger you ran in Step 2 automatically gives `admin@eubc.local` the admin role. You do not need to configure this manually.
 
 ---
 
@@ -73,8 +68,7 @@ Replace `YOUR-PROJECT-URL` with the Project URL and `YOUR-PUBLIC-KEY` with the p
 4. After a minute or two, GitHub will show you the live URL (e.g. `https://yourusername.github.io/eubc-transport/`).
 
 Key pages:
-- **Members view** (transport plans): `…/members.html`
-- **Admin / secretary view**: `…/admin.html` — keep this URL private; it is not linked from the main site.
+- **Admin / secretary view**: `…/admin.html` — keep this URL private; it is not linked from the main site. The secretary builds each day's transport here and shares it to the squad group chat as an image.
 
 ---
 
