@@ -1469,7 +1469,10 @@ function buildImageNode() {
   if (!table) return null;
 
   const wrap = document.createElement('div');
-  wrap.style.cssText = 'position:fixed;left:-9999px;top:0;background:#ffffff;color:#111;'
+  // Must sit at real on-screen coords for html-to-image to capture it, so we
+  // hide it behind the (opaque) app with z-index:-1 rather than parking it
+  // off-screen (left:-9999px renders blank in Chrome).
+  wrap.style.cssText = 'position:fixed;left:0;top:0;z-index:-1;background:#ffffff;color:#111;'
     + 'padding:24px;font-family:Inter,system-ui,sans-serif;width:max-content;';
 
   const heading = document.createElement('div');
@@ -1480,16 +1483,28 @@ function buildImageNode() {
   sub.textContent = [state.sessionDate, state.departureTime].filter(Boolean).join(' · ');
 
   const clone = table.cloneNode(true);
-  // Light theme for the cloned table (location colour bands are inline styles
-  // on the cells, so they survive the clone and stay readable on white).
+  // Make the clone fully self-contained: strip the dark-theme classes and set
+  // every style inline, so the captured image doesn't depend on the page's CSS
+  // variables (which would otherwise render dark cells / invisible text).
+  clone.className = '';
   clone.style.cssText = 'border-collapse:collapse;font-size:14px;color:#111;background:#fff;';
   clone.querySelectorAll('th, td').forEach(cell => {
+    const hadBand = !!cell.style.background;          // location colour band (inline bg)
+    const isLabel = cell.classList.contains('row-label');
+    cell.className = '';
     cell.style.border = '1px solid #ccc';
     cell.style.padding = '6px 10px';
-    if (cell.classList.contains('row-label')) {
+    cell.style.whiteSpace = 'nowrap';
+    if (hadBand) {
+      cell.style.color = '#000';                      // dark text on the saturated band
+      cell.style.fontWeight = '600';
+    } else if (isLabel) {
       cell.style.background = '#f2f2f2';
       cell.style.color = '#333';
       cell.style.fontWeight = '600';
+    } else {
+      cell.style.background = '#fff';
+      cell.style.color = '#111';
     }
   });
 
@@ -1507,7 +1522,7 @@ document.getElementById('save-image-btn').addEventListener('click', async () => 
   if (!node) { showMsg(msgEl, 'Nothing to capture yet.', 'err'); return; }
   document.body.appendChild(node);
   try {
-    const dataUrl = await htmlToImage.toPng(node, { backgroundColor: '#ffffff', pixelRatio: 2 });
+    const dataUrl = await htmlToImage.toPng(node, { backgroundColor: '#ffffff', pixelRatio: 2, skipFonts: true });
     const a = document.createElement('a');
     a.href = dataUrl;
     a.download = 'eubc-transport-' + (state.sessionDate || 'plan') + '.png';
