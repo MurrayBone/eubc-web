@@ -446,8 +446,8 @@
             <th>Squad</th>
             <th>Student No.</th>
             <th>Pickup</th>
-            <th>Drive</th>
             <th>Active</th>
+            <th>Drive</th>
             <th></th>
           </tr>
         </thead>
@@ -1755,13 +1755,29 @@ function renderRoster() {
       m.squad || '—',
       m.student_number || '—',
       m.pickup_location || '—',
-      m.can_drive ? '✓' : '',
       m.active ? '✓' : '',
     ].forEach(val => {
       const td = document.createElement('td');
       td.textContent = val;
       tr.appendChild(td);
     });
+
+    // Can Drive — inline toggle cell
+    const driveTd = document.createElement('td');
+    const driveToggle = document.createElement('button');
+    driveToggle.className = 'btn btn-sm' + (m.can_drive ? ' btn-primary' : '');
+    driveToggle.textContent = m.can_drive ? 'Driver ✓' : 'No car';
+    driveToggle.title = m.can_drive ? 'Click to remove driver status' : 'Click to mark as driver';
+    driveToggle.addEventListener('click', async () => {
+      try {
+        await window.EUBC.setMemberCanDrive(m.id, !m.can_drive);
+        await loadRoster();
+      } catch (e) {
+        showMsg(document.getElementById('member-msg'), 'Error: ' + (e.message || e), 'err');
+      }
+    });
+    driveTd.appendChild(driveToggle);
+    tr.appendChild(driveTd);
 
     const actTd = document.createElement('td');
     actTd.className = 'actions';

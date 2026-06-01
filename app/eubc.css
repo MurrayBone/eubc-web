@@ -167,6 +167,19 @@ label {
   margin-bottom: 0.4rem;
 }
 
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+  appearance: auto;
+  -webkit-appearance: auto;
+  background: revert;
+  border: revert;
+  border-radius: revert;
+  padding: revert;
+  box-shadow: none;
+  cursor: pointer;
+}
+
 input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
 select,
 textarea {

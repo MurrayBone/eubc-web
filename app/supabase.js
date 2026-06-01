@@ -131,6 +131,17 @@
     );
   }
 
+  async function setMemberCanDrive(id, can_drive) {
+    return unwrap(
+      await getClient()
+        .from('members')
+        .update({ can_drive })
+        .eq('id', id)
+        .select()
+        .single()
+    );
+  }
+
   async function deleteMember(id) {
     return unwrap(
       await getClient()
@@ -318,6 +329,7 @@
     listMembers,
     upsertMember,
     setMemberActive,
+    setMemberCanDrive,
     deleteMember,
     bulkImportMembers,
 
