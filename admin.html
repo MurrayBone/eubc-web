@@ -1507,24 +1507,16 @@ document.getElementById('save-image-btn').addEventListener('click', async () => 
   if (!node) { showMsg(msgEl, 'Nothing to capture yet.', 'err'); return; }
   document.body.appendChild(node);
   try {
-    const blob = await htmlToImage.toBlob(node, { backgroundColor: '#ffffff', pixelRatio: 2 });
-    const file = new File([blob], 'eubc-transport-' + (state.sessionDate || 'plan') + '.png', { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'EUBC Transport', text: 'Transport ' + (state.sessionDate || '') });
-    } else {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      showMsg(msgEl, 'Image downloaded — attach it in WhatsApp.', 'ok');
-    }
+    const dataUrl = await htmlToImage.toPng(node, { backgroundColor: '#ffffff', pixelRatio: 2 });
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'eubc-transport-' + (state.sessionDate || 'plan') + '.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    showMsg(msgEl, 'Image downloaded — attach it in WhatsApp.', 'ok');
   } catch (e) {
-    if (e && e.name === 'AbortError') { /* user dismissed the share sheet */ }
-    else { showMsg(msgEl, 'Image failed: ' + (e.message || e), 'err'); }
+    showMsg(msgEl, 'Image failed: ' + (e.message || e), 'err');
   } finally {
     node.remove();
   }
