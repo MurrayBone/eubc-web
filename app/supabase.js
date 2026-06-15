@@ -283,6 +283,96 @@
   }
 
   // --------------------------------------------------------------------------
+  // Social media planning — social_posts table
+  // --------------------------------------------------------------------------
+
+  // List posts whose post_date falls within [from, to] (inclusive, ISO yyyy-mm-dd).
+  async function listSocialPosts({ from, to } = {}) {
+    let query = getClient()
+      .from('social_posts')
+      .select('*')
+      .order('post_date', { ascending: true })
+      .order('created_at', { ascending: true });
+    if (from) query = query.gte('post_date', from);
+    if (to) query = query.lte('post_date', to);
+    return unwrap(await query);
+  }
+
+  async function upsertSocialPost(post) {
+    if (post.id) {
+      const { id, ...fields } = post;
+      fields.updated_at = new Date().toISOString();
+      return unwrap(
+        await getClient()
+          .from('social_posts')
+          .update(fields)
+          .eq('id', id)
+          .select()
+          .single()
+      );
+    }
+    return unwrap(
+      await getClient()
+        .from('social_posts')
+        .insert(post)
+        .select()
+        .single()
+    );
+  }
+
+  async function deleteSocialPost(id) {
+    return unwrap(
+      await getClient()
+        .from('social_posts')
+        .delete()
+        .eq('id', id)
+    );
+  }
+
+  // --------------------------------------------------------------------------
+  // Social media planning — key_dates table (calendar highlights)
+  // --------------------------------------------------------------------------
+
+  async function listKeyDates() {
+    return unwrap(
+      await getClient()
+        .from('key_dates')
+        .select('*')
+        .order('start_date', { ascending: true })
+    );
+  }
+
+  async function upsertKeyDate(kd) {
+    if (kd.id) {
+      const { id, ...fields } = kd;
+      return unwrap(
+        await getClient()
+          .from('key_dates')
+          .update(fields)
+          .eq('id', id)
+          .select()
+          .single()
+      );
+    }
+    return unwrap(
+      await getClient()
+        .from('key_dates')
+        .insert(kd)
+        .select()
+        .single()
+    );
+  }
+
+  async function deleteKeyDate(id) {
+    return unwrap(
+      await getClient()
+        .from('key_dates')
+        .delete()
+        .eq('id', id)
+    );
+  }
+
+  // --------------------------------------------------------------------------
   // App settings (single row with id = 1)
   // --------------------------------------------------------------------------
 
@@ -342,6 +432,16 @@
     listPlans,
     savePlan,
     publishPlan,
+
+    // Social posts
+    listSocialPosts,
+    upsertSocialPost,
+    deleteSocialPost,
+
+    // Key dates
+    listKeyDates,
+    upsertKeyDate,
+    deleteKeyDate,
 
     // Settings
     getSettings,

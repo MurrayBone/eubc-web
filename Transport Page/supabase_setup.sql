@@ -59,6 +59,34 @@ create table if not exists public.settings (
     data                 jsonb   not null default '{}'::jsonb
 );
 
+-- Social media planning calendar — many posts allowed per day (no unique on date).
+create table if not exists public.social_posts (
+    id          bigint generated always as identity primary key,
+    post_date   date not null,
+    title       text not null,                 -- what the post is
+    responsible text,                           -- free-text name
+    platform    text,                           -- Instagram | TikTok | Facebook | X | YouTube | Other
+    status      text not null default 'idea'
+                  check (status in ('idea', 'drafting', 'scheduled', 'posted')),
+    notes       text,
+    created_at  timestamptz not null default now(),
+    updated_at  timestamptz not null default now()
+);
+
+create index if not exists social_posts_date_idx on public.social_posts (post_date);
+
+-- Highlighted key dates on the social calendar (single day when end_date is null).
+create table if not exists public.key_dates (
+    id         bigint generated always as identity primary key,
+    label      text not null,
+    start_date date not null,
+    end_date   date,                            -- null => single day
+    category   text not null default 'custom'
+                 check (category in ('university', 'custom')),
+    colour     text,
+    created_at timestamptz not null default now()
+);
+
 
 -- ---------------------------------------------------------------------------
 -- 2. AUTO-PROFILE TRIGGER
@@ -116,6 +144,8 @@ alter table public.pickup_locations  enable row level security;
 alter table public.club_vehicles     enable row level security;
 alter table public.transport_plans   enable row level security;
 alter table public.settings          enable row level security;
+alter table public.social_posts      enable row level security;
+alter table public.key_dates         enable row level security;
 
 -- ── pickup_locations ────────────────────────────────────────────────────────
 
@@ -241,6 +271,68 @@ create policy "transport_plans: admin delete"
     to authenticated
     using (public.is_admin());
 
+-- ── social_posts ─────────────────────────────────────────────────────────────
+
+drop policy if exists "social_posts: authenticated select" on public.social_posts;
+create policy "social_posts: authenticated select"
+    on public.social_posts
+    for select
+    to authenticated
+    using (auth.role() = 'authenticated');
+
+drop policy if exists "social_posts: admin insert" on public.social_posts;
+create policy "social_posts: admin insert"
+    on public.social_posts
+    for insert
+    to authenticated
+    with check (public.is_admin());
+
+drop policy if exists "social_posts: admin update" on public.social_posts;
+create policy "social_posts: admin update"
+    on public.social_posts
+    for update
+    to authenticated
+    using (public.is_admin())
+    with check (public.is_admin());
+
+drop policy if exists "social_posts: admin delete" on public.social_posts;
+create policy "social_posts: admin delete"
+    on public.social_posts
+    for delete
+    to authenticated
+    using (public.is_admin());
+
+-- ── key_dates ────────────────────────────────────────────────────────────────
+
+drop policy if exists "key_dates: authenticated select" on public.key_dates;
+create policy "key_dates: authenticated select"
+    on public.key_dates
+    for select
+    to authenticated
+    using (auth.role() = 'authenticated');
+
+drop policy if exists "key_dates: admin insert" on public.key_dates;
+create policy "key_dates: admin insert"
+    on public.key_dates
+    for insert
+    to authenticated
+    with check (public.is_admin());
+
+drop policy if exists "key_dates: admin update" on public.key_dates;
+create policy "key_dates: admin update"
+    on public.key_dates
+    for update
+    to authenticated
+    using (public.is_admin())
+    with check (public.is_admin());
+
+drop policy if exists "key_dates: admin delete" on public.key_dates;
+create policy "key_dates: admin delete"
+    on public.key_dates
+    for delete
+    to authenticated
+    using (public.is_admin());
+
 -- ── members ──────────────────────────────────────────────────────────────────
 -- Members contain student numbers (PII) — only admins may read or write.
 
@@ -293,6 +385,22 @@ do $$ begin
         insert into public.club_vehicles (code, name) values
             ('CVF', 'Club minibus CVF'),
             ('CWY', 'Club minibus CWY');
+    end if;
+end $$;
+
+-- key_dates — University of Edinburgh 2026/27 academic year.
+-- Semester/break dates are confirmed; exam diets are officially "to be confirmed"
+-- for 2026/27, so they are seeded as approximate, clearly-labelled placeholders
+-- the committee can edit or delete once the real dates are published.
+do $$ begin
+    if not exists (select 1 from public.key_dates) then
+        insert into public.key_dates (label, start_date, end_date, category, colour) values
+            ('Semester 1',                     '2026-09-21', '2026-12-21', 'university', '#cfe7f3'),
+            ('Winter break',                   '2026-12-22', '2027-01-10', 'university', '#cdd9f0'),
+            ('Semester 2',                     '2027-01-11', '2027-05-21', 'university', '#cfe7f3'),
+            ('Spring break',                   '2027-04-05', '2027-04-16', 'university', '#cdd9f0'),
+            ('Exam diet S1 (approx — confirm)','2026-12-01', '2026-12-18', 'university', '#fdf3c4'),
+            ('Exam diet S2 (approx — confirm)','2027-04-26', '2027-05-21', 'university', '#fdf3c4');
     end if;
 end $$;
 

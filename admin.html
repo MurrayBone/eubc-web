@@ -332,6 +332,149 @@
 
     /* Placed token draggable back to bank */
     .placed[draggable="true"] { cursor: grab; }
+
+    /* ── Social calendar ── */
+    .cal-toolbar {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .cal-title {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      color: var(--text);
+      min-width: 11rem;
+      text-align: center;
+    }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .cal-dow {
+      background: var(--panel);
+      color: var(--muted);
+      font-size: .68rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: .45rem 0;
+      font-weight: 600;
+    }
+    .cal-day {
+      background: var(--bg);
+      min-height: 92px;
+      padding: .3rem .35rem .4rem;
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+      cursor: pointer;
+      transition: background .12s;
+      position: relative;
+    }
+    .cal-day:hover { background: var(--accent-soft); }
+    .cal-day.other-month { background: var(--panel); opacity: .55; }
+    .cal-day.today .cal-daynum {
+      background: var(--accent);
+      color: #07121a;
+      border-radius: 50%;
+    }
+    .cal-daynum {
+      font-size: .72rem;
+      color: var(--muted);
+      align-self: flex-end;
+      min-width: 1.25rem;
+      height: 1.25rem;
+      line-height: 1.25rem;
+      text-align: center;
+      font-weight: 600;
+    }
+    .cal-keybar {
+      font-size: .6rem;
+      line-height: 1.3;
+      padding: .08rem .3rem;
+      border-radius: 3px;
+      color: #07121a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 600;
+    }
+    .cal-chip {
+      font-size: .66rem;
+      line-height: 1.25;
+      padding: .12rem .35rem;
+      border-radius: 3px;
+      background: var(--panel-2);
+      border-left: 3px solid var(--muted);
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+    .cal-chip:hover { background: var(--accent-soft); }
+    .cal-chip.status-idea      { border-left-color: var(--muted); }
+    .cal-chip.status-drafting  { border-left-color: var(--accent); }
+    .cal-chip.status-scheduled { border-left-color: #f0c040; }
+    .cal-chip.status-posted    { border-left-color: var(--ok); opacity: .75; }
+    .cal-more { font-size: .6rem; color: var(--muted); padding-left: .2rem; }
+
+    /* Status pill (agenda) */
+    .pill {
+      font-size: .66rem;
+      padding: .1rem .45rem;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      text-transform: capitalize;
+      white-space: nowrap;
+    }
+    .pill.status-drafting  { color: var(--accent); border-color: rgba(153,214,234,.4); }
+    .pill.status-scheduled { color: #f0c040; border-color: rgba(240,192,64,.4); }
+    .pill.status-posted    { color: var(--ok); border-color: rgba(159,224,176,.4); }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 9, 12, .7);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 4rem 1rem;
+      z-index: 100;
+      overflow-y: auto;
+    }
+    .modal {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 1.3rem 1.4rem;
+      width: 100%;
+      max-width: 440px;
+    }
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .modal-title { font-size: .95rem; font-weight: 600; letter-spacing: .03em; }
+    .modal-actions {
+      display: flex;
+      gap: .6rem;
+      align-items: center;
+      margin-top: 1.2rem;
+    }
+    .modal-actions .spacer { flex: 1; }
   </style>
 </head>
 <body>
@@ -364,6 +507,7 @@
 
   <div class="tabs">
     <button class="tab active" data-tab="plan">Plan</button>
+    <button class="tab" data-tab="social">Social</button>
     <button class="tab" data-tab="roster">Roster</button>
     <button class="tab" data-tab="history">History</button>
     <button class="tab" data-tab="settings">Settings</button>
@@ -432,6 +576,45 @@
 
       </div><!-- /.builder-right -->
     </div><!-- /.builder-layout -->
+
+  </section>
+
+  <!-- ── TAB: Social media planner ── -->
+  <section class="panel" id="panel-social">
+
+    <div class="cal-toolbar">
+      <button class="btn btn-sm" id="cal-prev">‹ Prev</button>
+      <div class="cal-title" id="cal-title">—</div>
+      <button class="btn btn-sm" id="cal-next">Next ›</button>
+      <button class="btn btn-sm btn-ghost" id="cal-today">Today</button>
+      <div style="flex:1;"></div>
+      <button class="btn btn-sm" id="add-keydate-btn">+ Key date</button>
+    </div>
+
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="msg" id="social-msg"></div>
+
+    <div class="section-head">Upcoming posts</div>
+    <div style="overflow-x:auto;">
+      <table class="roster" id="agenda-table">
+        <thead>
+          <tr>
+            <th>Date</th><th>Post</th><th>Responsible</th><th>Platform</th><th>Status</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="agenda-body"></tbody>
+      </table>
+    </div>
+
+    <div class="section-head">Key dates</div>
+    <div style="overflow-x:auto;">
+      <table class="roster" id="keydates-table">
+        <thead>
+          <tr><th>Label</th><th>From</th><th>To</th><th>Type</th><th></th></tr>
+        </thead>
+        <tbody id="keydates-body"></tbody>
+      </table>
+    </div>
 
   </section>
 
@@ -558,6 +741,96 @@
     </div>
 
   </section>
+
+  <!-- ── Post editor modal ── -->
+  <div class="modal-overlay" id="post-modal" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title" id="post-modal-title">New post</div>
+        <button class="btn btn-sm btn-ghost" id="post-cancel">✕</button>
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="post-date" />
+      </div>
+      <div class="field">
+        <label>Post / description</label>
+        <input type="text" id="post-title" placeholder="e.g. Race day recap reel" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label>Responsible</label>
+        <input type="text" id="post-responsible" placeholder="Name" autocomplete="off" />
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Platform</label>
+          <select id="post-platform">
+            <option value="">—</option>
+            <option>Instagram</option>
+            <option>TikTok</option>
+            <option>Facebook</option>
+            <option>X</option>
+            <option>YouTube</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="post-status">
+            <option value="idea">Idea</option>
+            <option value="drafting">Drafting</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="posted">Posted</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Notes / caption</label>
+        <textarea id="post-notes" placeholder="Draft caption, links, details…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-sm btn-danger" id="post-delete" hidden>Delete</button>
+        <div class="spacer"></div>
+        <button class="btn btn-sm btn-ghost" id="post-cancel-2">Cancel</button>
+        <button class="btn btn-sm btn-primary" id="post-save">Save</button>
+      </div>
+      <div class="msg" id="post-msg"></div>
+    </div>
+  </div>
+
+  <!-- ── Key-date editor modal ── -->
+  <div class="modal-overlay" id="keydate-modal" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title">Add key date</div>
+        <button class="btn btn-sm btn-ghost" id="keydate-cancel">✕</button>
+      </div>
+      <div class="field">
+        <label>Label</label>
+        <input type="text" id="keydate-label" placeholder="e.g. Scottish Champs / Media officer away" autocomplete="off" />
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>From</label>
+          <input type="date" id="keydate-start" />
+        </div>
+        <div class="field">
+          <label>To (optional)</label>
+          <input type="date" id="keydate-end" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Highlight colour</label>
+        <input type="color" id="keydate-colour" value="#99d6ea" style="width:48px;height:32px;padding:2px;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;" />
+      </div>
+      <div class="modal-actions">
+        <div class="spacer"></div>
+        <button class="btn btn-sm btn-ghost" id="keydate-cancel-2">Cancel</button>
+        <button class="btn btn-sm btn-primary" id="keydate-save">Save</button>
+      </div>
+      <div class="msg" id="keydate-msg"></div>
+    </div>
+  </div>
 </div><!-- /#app -->
 
 <script>
@@ -781,6 +1054,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    if (tab.dataset.tab === 'social') loadSocial();
     if (tab.dataset.tab === 'roster') loadRoster();
     if (tab.dataset.tab === 'history') loadHistory();
     if (tab.dataset.tab === 'settings') loadLocationSettings();
@@ -2171,6 +2445,348 @@ document.getElementById('add-loc-btn').addEventListener('click', async () => {
     document.getElementById('s-loc-sort').value = '0';
     showMsg(msgEl, 'Location added.', 'ok');
     await loadLocationSettings();
+  } catch (e) {
+    showMsg(msgEl, 'Error: ' + (e.message || e), 'err');
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+//  SOCIAL MEDIA PLANNER
+// ═══════════════════════════════════════════════════════
+
+const social = {
+  month: (function () { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1); })(),
+  posts: [],
+  keyDates: [],
+  editingPostId: null,
+};
+
+const MONTH_NAMES = ['January','February','March','April','May','June',
+  'July','August','September','October','November','December'];
+
+// yyyy-mm-dd for a Date (local, not UTC).
+function isoDate(dt) {
+  return dt.getFullYear() + '-' +
+    String(dt.getMonth() + 1).padStart(2, '0') + '-' +
+    String(dt.getDate()).padStart(2, '0');
+}
+
+function todayIso() { return isoDate(new Date()); }
+
+// Monday-start grid: how many leading blanks before the 1st.
+function leadingBlanks(year, month) {
+  const dow = new Date(year, month, 1).getDay(); // 0=Sun
+  return (dow + 6) % 7; // Mon=0 … Sun=6
+}
+
+async function loadSocial() {
+  const grid = document.getElementById('cal-grid');
+  const y = social.month.getFullYear();
+  const m = social.month.getMonth();
+  // Fetch a window that covers the visible grid (prev/next month spillover).
+  const from = isoDate(new Date(y, m, 1 - leadingBlanks(y, m)));
+  const to = isoDate(new Date(y, m + 1, 14));
+  try {
+    const [posts, keyDates] = await Promise.all([
+      window.EUBC.listSocialPosts({ from, to: isoDate(new Date(y, m + 1, 0)) }),
+      window.EUBC.listKeyDates(),
+    ]);
+    social.posts = posts || [];
+    social.keyDates = keyDates || [];
+  } catch (e) {
+    showMsg(document.getElementById('social-msg'), 'Could not load: ' + (e.message || e), 'err');
+    return;
+  }
+  renderCalendar();
+  renderAgenda();
+  renderKeyDates();
+}
+
+function keyDatesOn(iso) {
+  return social.keyDates.filter(k => {
+    const end = k.end_date || k.start_date;
+    return iso >= k.start_date && iso <= end;
+  });
+}
+
+function renderCalendar() {
+  const y = social.month.getFullYear();
+  const m = social.month.getMonth();
+  document.getElementById('cal-title').textContent = MONTH_NAMES[m] + ' ' + y;
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'cal-dow';
+    h.textContent = d;
+    grid.appendChild(h);
+  });
+
+  const lead = leadingBlanks(y, m);
+  const start = new Date(y, m, 1 - lead);
+  const today = todayIso();
+
+  // Group posts by date for quick lookup.
+  const byDate = {};
+  social.posts.forEach(p => { (byDate[p.post_date] = byDate[p.post_date] || []).push(p); });
+
+  for (let i = 0; i < 42; i++) {
+    const dt = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const iso = isoDate(dt);
+    const cell = document.createElement('div');
+    cell.className = 'cal-day';
+    if (dt.getMonth() !== m) cell.classList.add('other-month');
+    if (iso === today) cell.classList.add('today');
+    cell.addEventListener('click', () => openPostModal(iso));
+
+    const num = document.createElement('div');
+    num.className = 'cal-daynum';
+    num.textContent = dt.getDate();
+    cell.appendChild(num);
+
+    // Key-date highlight bars.
+    keyDatesOn(iso).forEach(k => {
+      const bar = document.createElement('div');
+      bar.className = 'cal-keybar';
+      bar.style.background = k.colour || 'var(--accent)';
+      bar.textContent = k.label;
+      bar.title = k.label;
+      cell.appendChild(bar);
+    });
+
+    // Post chips (cap at 3, then "+N more").
+    const dayPosts = byDate[iso] || [];
+    dayPosts.slice(0, 3).forEach(p => {
+      const chip = document.createElement('div');
+      chip.className = 'cal-chip status-' + p.status;
+      chip.textContent = (p.platform ? p.platform[0] + '· ' : '') + p.title;
+      chip.title = p.title + (p.responsible ? ' — ' + p.responsible : '');
+      chip.addEventListener('click', (e) => { e.stopPropagation(); openPostModal(iso, p); });
+      cell.appendChild(chip);
+    });
+    if (dayPosts.length > 3) {
+      const more = document.createElement('div');
+      more.className = 'cal-more';
+      more.textContent = '+' + (dayPosts.length - 3) + ' more';
+      cell.appendChild(more);
+    }
+
+    grid.appendChild(cell);
+  }
+}
+
+function renderAgenda() {
+  const body = document.getElementById('agenda-body');
+  body.innerHTML = '';
+  const today = todayIso();
+  const upcoming = social.posts
+    .filter(p => p.post_date >= today)
+    .sort((a, b) => a.post_date.localeCompare(b.post_date));
+
+  if (!upcoming.length) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 6;
+    td.style.color = 'var(--muted)';
+    td.textContent = 'No upcoming posts in this month.';
+    tr.appendChild(td);
+    body.appendChild(tr);
+    return;
+  }
+
+  upcoming.forEach(p => {
+    const tr = document.createElement('tr');
+    const cells = [
+      fmtDateCol(p.post_date),
+      p.title,
+      p.responsible || '',
+      p.platform || '',
+    ];
+    cells.forEach(txt => {
+      const td = document.createElement('td');
+      td.textContent = txt;
+      tr.appendChild(td);
+    });
+    const statusTd = document.createElement('td');
+    const pill = document.createElement('span');
+    pill.className = 'pill status-' + p.status;
+    pill.textContent = p.status;
+    statusTd.appendChild(pill);
+    tr.appendChild(statusTd);
+
+    const actTd = document.createElement('td');
+    const editBtn = document.createElement('button');
+    editBtn.className = 'btn btn-sm btn-ghost';
+    editBtn.textContent = 'Edit';
+    editBtn.addEventListener('click', () => openPostModal(p.post_date, p));
+    actTd.appendChild(editBtn);
+    tr.appendChild(actTd);
+
+    body.appendChild(tr);
+  });
+}
+
+function renderKeyDates() {
+  const body = document.getElementById('keydates-body');
+  body.innerHTML = '';
+  social.keyDates.forEach(k => {
+    const tr = document.createElement('tr');
+
+    const labelTd = document.createElement('td');
+    const sw = document.createElement('span');
+    sw.className = 'colour-swatch';
+    sw.style.background = k.colour || 'var(--accent)';
+    labelTd.appendChild(sw);
+    labelTd.appendChild(document.createTextNode(' ' + k.label));
+    tr.appendChild(labelTd);
+
+    [fmtDateCol(k.start_date), k.end_date ? fmtDateCol(k.end_date) : '—', k.category]
+      .forEach(txt => {
+        const td = document.createElement('td');
+        td.textContent = txt;
+        tr.appendChild(td);
+      });
+
+    const actTd = document.createElement('td');
+    const del = document.createElement('button');
+    del.className = 'btn btn-sm btn-danger';
+    del.textContent = 'Delete';
+    del.addEventListener('click', async () => {
+      if (!confirm('Delete key date "' + k.label + '"?')) return;
+      try {
+        await window.EUBC.deleteKeyDate(k.id);
+        await loadSocial();
+      } catch (e) {
+        showMsg(document.getElementById('social-msg'), 'Error: ' + (e.message || e), 'err');
+      }
+    });
+    actTd.appendChild(del);
+    tr.appendChild(actTd);
+
+    body.appendChild(tr);
+  });
+}
+
+// ── Calendar navigation ─────────────────────────────────
+document.getElementById('cal-prev').addEventListener('click', () => {
+  social.month = new Date(social.month.getFullYear(), social.month.getMonth() - 1, 1);
+  loadSocial();
+});
+document.getElementById('cal-next').addEventListener('click', () => {
+  social.month = new Date(social.month.getFullYear(), social.month.getMonth() + 1, 1);
+  loadSocial();
+});
+document.getElementById('cal-today').addEventListener('click', () => {
+  const n = new Date();
+  social.month = new Date(n.getFullYear(), n.getMonth(), 1);
+  loadSocial();
+});
+
+// ── Post modal ──────────────────────────────────────────
+function openPostModal(iso, post) {
+  social.editingPostId = post ? post.id : null;
+  document.getElementById('post-modal-title').textContent = post ? 'Edit post' : 'New post';
+  document.getElementById('post-date').value = post ? post.post_date : iso;
+  document.getElementById('post-title').value = post ? post.title : '';
+  document.getElementById('post-responsible').value = post ? (post.responsible || '') : '';
+  document.getElementById('post-platform').value = post ? (post.platform || '') : '';
+  document.getElementById('post-status').value = post ? post.status : 'idea';
+  document.getElementById('post-notes').value = post ? (post.notes || '') : '';
+  document.getElementById('post-delete').hidden = !post;
+  document.getElementById('post-msg').className = 'msg';
+  document.getElementById('post-modal').hidden = false;
+  document.getElementById('post-title').focus();
+}
+
+function closePostModal() {
+  document.getElementById('post-modal').hidden = true;
+  social.editingPostId = null;
+}
+
+document.getElementById('post-cancel').addEventListener('click', closePostModal);
+document.getElementById('post-cancel-2').addEventListener('click', closePostModal);
+document.getElementById('post-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'post-modal') closePostModal();
+});
+
+document.getElementById('post-save').addEventListener('click', async () => {
+  const msgEl = document.getElementById('post-msg');
+  const title = document.getElementById('post-title').value.trim();
+  const date = document.getElementById('post-date').value;
+  if (!date) { showMsg(msgEl, 'Please choose a date.', 'err'); return; }
+  if (!title) { showMsg(msgEl, 'Please enter what the post is.', 'err'); return; }
+  const post = {
+    post_date: date,
+    title,
+    responsible: document.getElementById('post-responsible').value.trim() || null,
+    platform: document.getElementById('post-platform').value || null,
+    status: document.getElementById('post-status').value,
+    notes: document.getElementById('post-notes').value.trim() || null,
+  };
+  if (social.editingPostId) post.id = social.editingPostId;
+  try {
+    await window.EUBC.upsertSocialPost(post);
+    closePostModal();
+    await loadSocial();
+  } catch (e) {
+    showMsg(msgEl, 'Error: ' + (e.message || e), 'err');
+  }
+});
+
+document.getElementById('post-delete').addEventListener('click', async () => {
+  if (!social.editingPostId) return;
+  if (!confirm('Delete this post?')) return;
+  try {
+    await window.EUBC.deleteSocialPost(social.editingPostId);
+    closePostModal();
+    await loadSocial();
+  } catch (e) {
+    showMsg(document.getElementById('post-msg'), 'Error: ' + (e.message || e), 'err');
+  }
+});
+
+// ── Key-date modal ──────────────────────────────────────
+function openKeyDateModal() {
+  document.getElementById('keydate-label').value = '';
+  document.getElementById('keydate-start').value = '';
+  document.getElementById('keydate-end').value = '';
+  document.getElementById('keydate-colour').value = '#99d6ea';
+  document.getElementById('keydate-msg').className = 'msg';
+  document.getElementById('keydate-modal').hidden = false;
+  document.getElementById('keydate-label').focus();
+}
+
+function closeKeyDateModal() {
+  document.getElementById('keydate-modal').hidden = true;
+}
+
+document.getElementById('add-keydate-btn').addEventListener('click', openKeyDateModal);
+document.getElementById('keydate-cancel').addEventListener('click', closeKeyDateModal);
+document.getElementById('keydate-cancel-2').addEventListener('click', closeKeyDateModal);
+document.getElementById('keydate-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'keydate-modal') closeKeyDateModal();
+});
+
+document.getElementById('keydate-save').addEventListener('click', async () => {
+  const msgEl = document.getElementById('keydate-msg');
+  const label = document.getElementById('keydate-label').value.trim();
+  const start = document.getElementById('keydate-start').value;
+  const end = document.getElementById('keydate-end').value;
+  if (!label) { showMsg(msgEl, 'Please enter a label.', 'err'); return; }
+  if (!start) { showMsg(msgEl, 'Please choose a start date.', 'err'); return; }
+  if (end && end < start) { showMsg(msgEl, 'End date is before start date.', 'err'); return; }
+  try {
+    await window.EUBC.upsertKeyDate({
+      label,
+      start_date: start,
+      end_date: end || null,
+      category: 'custom',
+      colour: document.getElementById('keydate-colour').value,
+    });
+    closeKeyDateModal();
+    await loadSocial();
   } catch (e) {
     showMsg(msgEl, 'Error: ' + (e.message || e), 'err');
   }
