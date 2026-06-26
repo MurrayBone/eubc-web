@@ -1,0 +1,512 @@
+/* =============================================================================
+   EUBC admin tool styles — shared by the admin hub, transport, and social pages.
+   Loaded after app/eubc.css so these rules override/extend the base components.
+   ============================================================================= */
+
+/* ── Admin-specific layout overrides ── */
+
+/* Gate */
+.gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+.gate-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.gate-card .crest { width: 80px; margin: 0 auto; display: block; }
+.gate-card h1 { font-size: 1.4rem; color: var(--accent); letter-spacing: .12em; margin: 0; }
+
+/* Nav */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .75rem 1.5rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-logo {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: .1em;
+  color: var(--accent);
+  text-decoration: none;
+}
+.nav-right { display: flex; gap: .75rem; align-items: center; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+  padding: 0 1.5rem;
+}
+.tab {
+  padding: .65rem 1.2rem;
+  font-size: .8rem;
+  letter-spacing: .1em;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  transition: color .15s, border-color .15s;
+  font-family: inherit;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Panels — tab sections (override eubc.css .panel card style) */
+.panel {
+  display: none;
+  padding: 1.5rem;
+  max-width: 1300px;
+  margin: 0 auto;
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+.panel.active { display: block; }
+
+/* Fields & forms */
+.field { display: flex; flex-direction: column; gap: .3rem; margin-bottom: .8rem; }
+.field label { font-size: .72rem; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+.field input:not([type="checkbox"]):not([type="radio"]):not([type="color"]), .field select, .field textarea {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text);
+  padding: .45rem .65rem;
+  font-size: .88rem;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+.field input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):focus, .field select:focus, .field textarea:focus {
+  outline: none; border-color: var(--accent);
+}
+.field textarea { resize: vertical; min-height: 100px; }
+
+/* Buttons — admin-specific size and danger variants */
+.btn-sm { padding: .3rem .65rem; font-size: .72rem; }
+.btn-danger { border-color: rgba(255,138,138,.4); color: var(--danger); }
+.btn-danger:hover { background: rgba(255,138,138,.1); border-color: var(--danger); }
+
+/* Messages */
+.msg {
+  font-size: .82rem;
+  padding: .5rem .8rem;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  margin-top: .5rem;
+  display: none;
+}
+.msg.show { display: block; }
+.msg.ok { border-color: rgba(159,224,176,.3); color: var(--ok); background: rgba(159,224,176,.07); }
+.msg.err { border-color: rgba(255,138,138,.3); color: var(--danger); background: rgba(255,138,138,.07); }
+
+/* Cards */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .8rem;
+}
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .85rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--text);
+}
+.colour-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Plan preview */
+.plan-wrap { overflow-x: auto; margin-top: 1.2rem; }
+.plan-table {
+  border-collapse: collapse;
+  font-size: .78rem;
+  min-width: 600px;
+  width: 100%;
+}
+.plan-table th, .plan-table td {
+  border: 1px solid var(--line);
+  padding: .35rem .55rem;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--text);
+  background: var(--bg);
+}
+.plan-table th { background: var(--panel); font-weight: 600; letter-spacing: .05em; }
+.row-label { font-weight: 600; color: var(--muted); background: var(--panel) !important; }
+.on-band { /* coloured location header — inline style sets bg */ }
+
+/* Row actions */
+.row-actions {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+/* Section headings */
+.section-head {
+  font-size: .78rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 1.2rem 0 .6rem;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+.section-head::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* Roster table */
+table.roster {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .8rem;
+}
+table.roster th, table.roster td {
+  border-bottom: 1px solid var(--line);
+  padding: .5rem .6rem;
+  text-align: left;
+  color: var(--text);
+}
+table.roster th {
+  background: var(--panel);
+  font-size: .7rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+table.roster tr:hover td { background: var(--accent-soft); }
+table.roster .actions { display: flex; gap: .3rem; }
+
+/* Settings */
+.settings-form {
+  max-width: 400px;
+}
+.settings-note {
+  font-size: .78rem;
+  color: var(--muted);
+  margin-top: .3rem;
+  line-height: 1.5;
+}
+
+/* Controls bar */
+.controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+.controls-bar .field { margin-bottom: 0; }
+
+/* Grid helpers */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+@media (max-width: 640px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+[hidden] { display: none !important; }
+
+/* App wrapper hidden by default */
+#app { display: none; }
+
+/* ── Builder-specific admin tweaks ── */
+
+/* Bank header */
+.bank-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .5rem;
+  gap: .5rem;
+}
+.bank-title {
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+.bank-guest-btn {
+  font-size: .7rem;
+  padding: .2rem .5rem;
+  white-space: nowrap;
+}
+
+/* Bank as drop target for un-assigning */
+.bank.drop-zone--over {
+  outline: 2px dashed var(--accent);
+  outline-offset: -4px;
+}
+
+/* Location card (wraps cars) */
+.location-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+}
+.location-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .75rem;
+}
+
+/* Inline vehicle select in car head */
+.car-card-head select {
+  flex: 1;
+  max-width: 200px;
+}
+
+/* "Not a driver" zone note styling */
+.zone-note--warn {
+  color: #f0c040;
+}
+
+/* Right column (locations + everything below the bank) */
+.builder-right {
+  min-width: 0;
+}
+
+/* Own way section header in builder */
+.ownway-section { margin-top: 1rem; }
+
+/* Placed token draggable back to bank */
+.placed[draggable="true"] { cursor: grab; }
+
+/* ── Social calendar ── */
+.cal-toolbar {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.cal-title {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--text);
+  min-width: 11rem;
+  text-align: center;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.cal-dow {
+  background: var(--panel);
+  color: var(--muted);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: .45rem 0;
+  font-weight: 600;
+}
+.cal-day {
+  background: var(--bg);
+  min-height: 92px;
+  padding: .3rem .35rem .4rem;
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+  cursor: pointer;
+  transition: background .12s;
+  position: relative;
+}
+.cal-day:hover { background: var(--accent-soft); }
+.cal-day.other-month { background: var(--panel); opacity: .55; }
+.cal-day.today .cal-daynum {
+  background: var(--accent);
+  color: #07121a;
+  border-radius: 50%;
+}
+.cal-daynum {
+  font-size: .72rem;
+  color: var(--muted);
+  align-self: flex-end;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  line-height: 1.25rem;
+  text-align: center;
+  font-weight: 600;
+}
+.cal-keybar {
+  font-size: .6rem;
+  line-height: 1.3;
+  padding: .08rem .3rem;
+  border-radius: 3px;
+  color: #07121a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+.cal-chip {
+  font-size: .66rem;
+  line-height: 1.25;
+  padding: .12rem .35rem;
+  border-radius: 3px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--muted);
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.cal-chip:hover { background: var(--accent-soft); }
+.cal-chip.status-idea      { border-left-color: var(--muted); }
+.cal-chip.status-drafting  { border-left-color: var(--accent); }
+.cal-chip.status-scheduled { border-left-color: #f0c040; }
+.cal-chip.status-posted    { border-left-color: var(--ok); opacity: .75; }
+.cal-more { font-size: .6rem; color: var(--muted); padding-left: .2rem; }
+
+/* Status pill (agenda) */
+.pill {
+  font-size: .66rem;
+  padding: .1rem .45rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.pill.status-drafting  { color: var(--accent); border-color: rgba(153,214,234,.4); }
+.pill.status-scheduled { color: #f0c040; border-color: rgba(240,192,64,.4); }
+.pill.status-posted    { color: var(--ok); border-color: rgba(159,224,176,.4); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 9, 12, .7);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4rem 1rem;
+  z-index: 100;
+  overflow-y: auto;
+}
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1.3rem 1.4rem;
+  width: 100%;
+  max-width: 440px;
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.modal-title { font-size: .95rem; font-weight: 600; letter-spacing: .03em; }
+.modal-actions {
+  display: flex;
+  gap: .6rem;
+  align-items: center;
+  margin-top: 1.2rem;
+}
+.modal-actions .spacer { flex: 1; }
+
+/* ── Admin hub (home) cards ── */
+.hub-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+.hub-intro {
+  color: var(--muted);
+  font-size: .9rem;
+  margin: 0 0 1.6rem;
+}
+.hub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+@media (max-width: 640px) { .hub-grid { grid-template-columns: 1fr; } }
+.hub-card {
+  display: block;
+  text-decoration: none;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1.6rem 1.5rem;
+  transition: border-color .15s, transform .15s, background .15s;
+}
+.hub-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-2px);
+}
+.hub-card h2 {
+  margin: 0 0 .4rem;
+  font-size: 1.1rem;
+  color: var(--accent);
+  letter-spacing: .04em;
+}
+.hub-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .85rem;
+  line-height: 1.5;
+}
+.hub-card .hub-icon { font-size: 1.8rem; display: block; margin-bottom: .6rem; }
