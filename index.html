@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Edinburgh University Boat Club</title>
+  <!-- Paint the hero instantly with a poster while the video streams in -->
+  <link rel="preload" as="image" href="images/hero-poster.jpg" fetchpriority="high" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -359,9 +361,9 @@
 
   <!-- HERO -->
   <section class="hero">
-    <video id="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
-      <source src="images/DJI_0312.mov" type="video/quicktime" />
-      <source src="images/DJI_0312.mov" type="video/mp4" />
+    <video id="hero-video" autoplay muted loop playsinline webkit-playsinline
+           preload="auto" poster="images/hero-poster.jpg">
+      <source src="images/hero.mp4" type="video/mp4" />
     </video>
     <div class="hero-overlay"></div>
     <div class="hero-logo-wrap">
