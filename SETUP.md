@@ -91,3 +91,18 @@ The publishable (or anon) key pasted into `app/config.js` is intentionally publi
 - Members logging in can only see **published** transport plans and their own profile. They cannot see student numbers or other members' details.
 - Only the admin account can create or edit plans, manage the roster, or change settings.
 - To change a password at any time: Supabase dashboard → **Authentication** → **Users** → click the user → **Send password recovery** (or set a new password directly from the dashboard).
+
+---
+
+## Keeping the project alive (important)
+
+Free-tier Supabase projects **pause after 7 days with no API activity**, and if left paused for an extended period, Supabase **permanently deletes** the project — database, auth users, and all. Because this app is only used on training mornings, a quiet stretch (summer break, exam season) is enough to trigger this. If the admin password stops working and nothing in this repo has changed, check the Supabase dashboard first — the project may be paused or gone, not the password.
+
+To stop this happening again, do one of the following:
+
+- **Best fix — upgrade to the Pro plan** (~$25/month): paid projects never auto-pause. Worth it if the club can cover the cost.
+- **Free-tier workaround — keep it warm (already set up)**: [.github/workflows/supabase-keepalive.yml](.github/workflows/supabase-keepalive.yml) pings the project's REST API every Monday via a GitHub Actions cron job, so it never sits idle long enough to pause. It only runs once this repo is pushed to GitHub (Step 5) — check the **Actions** tab there to confirm it's running, and you can trigger it manually anytime with **Run workflow**.
+
+Either way, **back up your data periodically** — `docs/supabase_setup.sql` only rebuilds empty tables/structure, not the actual roster, pickup locations, or past transport plans. In the Supabase dashboard: **Database → Backups** (Pro plans get automatic daily backups), or manually export each table from **Table Editor → Export as CSV** every so often.
+
+If a project does get deleted, recovery means starting over: create a new project, re-run `docs/supabase_setup.sql`, recreate the `admin@eubc.local` user (Step 3 above), re-enter the roster, and update `app/config.js` with the new URL/key.

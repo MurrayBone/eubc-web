@@ -1,0 +1,19 @@
+name: Supabase keep-alive
+
+# Free-tier Supabase projects auto-pause after 7 days with no API activity
+# (see SETUP.md → "Keeping the project alive"). This ping keeps the project
+# active so the admin login doesn't break again between training sessions.
+on:
+  schedule:
+    - cron: '0 6 * * 1' # every Monday at 06:00 UTC
+  workflow_dispatch: {} # allows a manual "Run workflow" to test it on demand
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          curl -sf "https://kvwvjawzkrdjfbvtunaj.supabase.co/rest/v1/" \
+            -H "apikey: sb_publishable_1rkqag-1qJU3Spiv-6oFVg_My8Pcpe7" \
+            -o /dev/null -w "HTTP %{http_code}\n"
